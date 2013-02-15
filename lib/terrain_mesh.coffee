@@ -4,32 +4,38 @@ class TerrainMesh
     @observers = []
 
   addFirstTile: (tile) ->
-    throw "Tiles are already started, you must add a Neighbor to and existing tile now" unless @tiles.length == 0
+    throw "Tiles are already started, you can only add tiles at hex coordinates from origin now" unless @tiles.length == 0
 
-    tile.position = [1, 0, 0]
+    tile.firstTile = true
+
     @tiles.push tile
     @notifyObservers()
 
-  addNeighborTo: (olderNeighbor, neighborIndex, newNeighbor) ->
-    if (neighborIndex.length or 1) > 1
-      return @addNeighborTo(olderNeighbor.neighbors[neighborIndex.shift()], neighborIndex, newNeighbor)
-    
-    neighborIndex = neighborIndex?[0] or neighborIndex
+  getOriginTile: -> @tiles[0]
 
-    inverseIndex = (neighborIndex+3)%6
+  getTileAtCoordinates: (hexCoordinates) ->
+    currentTile = @getOriginTile()
 
-    # try
-    throw "Neighbor already exists at #{neighborIndex}" if olderNeighbor.neighbors[neighborIndex]?
-    # catch e
-    #   # debugger
+    while hexCoordinates.length > 1
+      currentTile = currentTile.neighbors[hexCoordinates.shift()]
 
-    olderNeighbor.neighbors[neighborIndex] = newNeighbor
-    # newNeighbor.neighbors[inverseIndex] = olderNeighbor
+    finalCoordinate = (hexCoordinates?[0] or hexCoordinates)
 
-    newNeighbor.neighborTo = olderNeighbor
-    newNeighbor.neighborAt = neighborIndex
+    [currentTile, finalCoordinate]
 
-    @tiles.push(newNeighbor)
+  addTile: (hexCoordinates, tileProperties=["grass"]) ->
+    newTile = MageKnight.Tile.fromArray(tileProperties)
+    newTile.position = hexCoordinates.slice(0)
+
+    [parentTile, neighborIndex] = @getTileAtCoordinates(hexCoordinates)
+
+    if parentTile.neighbors[neighborIndex]?
+      throw "Neighbor already exists at #{neighborIndex}"
+
+    parentTile.neighbors[neighborIndex] = newTile
+    newTile.neighbors[(neighborIndex+3)%6] = parentTile
+
+    @tiles.push(newTile)
     @notifyObservers()
 
 

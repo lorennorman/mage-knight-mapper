@@ -11,22 +11,24 @@
 
 <script>
   $(function() {
-    // MageKnight.drawATile("grass", "magetower");
-    // MageKnight.drawATile("forest", "glade");
-    // MageKnight.drawATile("hills");
-    // MageKnight.drawATile("desert", "fortress");
-
-    // MageKnight.drawATile("water");
     MageKnight.startWithMegaTile([
-               [ [ "grass", "village" ], [ "forest" ] ],               // looks like
-      [ [ "water" ], [ "grass", "portal" ], [ "grass" ] ],  // <--- a
-               [ [ "water" ], [ "grass", "orcs" ] ],                // hex tile (no)
-
-     //    [ [ "hills", "dungeon" ], [ "forest" ] ],
-     //  [ [ "hills" ], [ "mountain" ], [ "grass" ] ],
-     // [ [ "hills", "fortress" ], [ "hills", "altar" ] ]
- 
+               [ [ "grass", "village" ], [ "forest" ] ],
+      [ [ "water" ], [ "grass", "portal" ], [ "grass" ] ],
+               [ [ "water" ], [ "grass", "orcs" ] ]
     ]);
+
+    terrainMesh = MageKnight.bootstrap()
+    terrainMesh.addTile([0, 0],    ["forest"])
+    terrainMesh.addTile([0, 5],    ["mountain"])
+    terrainMesh.addTile([0, 0, 1], ["forest", "fortress"])
+    terrainMesh.addTile([1, 1],    ["swamp"])
+    terrainMesh.addTile([1, 1, 1], ["hill",   "glade"])
+    terrainMesh.addTile([1, 1, 2], ["grass",  "monastery"])
+    terrainMesh.addTile([1, 2],    ["water"])
+    terrainMesh.addTile([1, 2, 2], ["water"])
+    terrainMesh.addTile([1, 2, 3], ["water"])
+    terrainMesh.addTile([2, 3],    ["water"])
+    terrainMesh.addTile([4, 3],    ["desert", "magetower"])
   });
 </script>
 
