@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mage Knight Spec</title>
+    <link rel="stylesheet" href="mocha.css" />
+  </head>
+
+  <body>
+    <div id="mocha"></div>
+
+    <script src="/create.js"></script>
+    <!-- system under test -->
+    <script src="/mage_knight.js"></script>
+
+    <!-- spec framework setup -->
+    <script src="/jquery.js"></script>
+    <script src="/underscore.js"></script>
+    <script src="/expect.js"></script>
+    <script src="/mocha.js"></script>
+    <script>mocha.setup('bdd')</script>
+
+    <!-- load our specs -->
+    <script src="/specs.js"></script>
+
+    <!-- run loaded specs -->
+    <script>
+      mocha.run();
+    </script>
+  </body>
+</html>

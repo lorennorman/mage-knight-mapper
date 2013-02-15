@@ -1,0 +1,37 @@
+<style>
+  canvas {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script src='/jquery.js'></script>
+<script src='/create.js'></script>
+<script src='/mage_knight.js'></script>
+
+<script>
+  $(function() {
+    // MageKnight.drawATile("grass", "magetower");
+    // MageKnight.drawATile("forest", "glade");
+    // MageKnight.drawATile("hills");
+    // MageKnight.drawATile("desert", "fortress");
+
+    // MageKnight.drawATile("water");
+    MageKnight.startWithMegaTile([
+               [ [ "grass", "village" ], [ "forest" ] ],               // looks like
+      [ [ "water" ], [ "grass", "portal" ], [ "grass" ] ],  // <--- a
+               [ [ "water" ], [ "grass", "orcs" ] ],                // hex tile (no)
+
+     //    [ [ "hills", "dungeon" ], [ "forest" ] ],
+     //  [ [ "hills" ], [ "mountain" ], [ "grass" ] ],
+     // [ [ "hills", "fortress" ], [ "hills", "altar" ] ]
+ 
+    ]);
+  });
+</script>
+
+<div id="container">
+  <canvas id="demo" width="640" height="480">
+    Your browser, it won't go.
+  </canvas>
+</div>
