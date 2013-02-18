@@ -1,6 +1,6 @@
 TileView =
   width: 150
-  height: 188
+  height: 196
 
   parityChart: 
     0: [1, -1]
@@ -26,7 +26,7 @@ TileView =
     forest: "forest"
     hill: "hill"
     mountain: "mountain"
-    water: "water"
+    water: "water/1"
     swamp: "swamp"
     wasteland: "wasteland"
 
@@ -66,10 +66,6 @@ TileView =
   getTerrainView: (terrain) ->
     if @terrainFileMap[terrain]?
       terrainView = new createjs.Bitmap("terrain/#{@terrainFileMap[terrain]}.png")
-
-      unless terrain is "grass" or terrain is "hill" or terrain is "wasteland"
-        terrainView.scaleX = .64
-        terrainView.scaleY = .7
     else
       console.log "missing #{terrain} file"
       terrainView = new createjs.Shape()
@@ -80,10 +76,10 @@ TileView =
   getFeatureView: (feature) ->
     if @featureFileMap[feature]?
       featureView = new createjs.Bitmap("feature/#{@featureFileMap[feature]}.png")
-
     else
-      featureView = new createjs.Shape()
-      featureView.graphics.beginFill(@featureColorMap[feature]).drawCircle(115, 137, 40)
+      console.log "missing #{feature} file"
+      terrainView = new createjs.Shape()
+      terrainView.graphics.beginFill("red").drawCircle(0, 0, 90)
 
     featureView
 
@@ -97,7 +93,7 @@ TileView =
 
     container.updateByModel = (model) =>
       newTerrainView = @getTerrainView(model.terrain)
-      newFeatureView = @getFeatureView(model.feature)
+      newFeatureView = @getFeatureView(model.feature) if model.feature?
 
       container.removeChild(currentTerrainView) if currentTerrainView?
       container.addChild(newTerrainView)
@@ -108,6 +104,12 @@ TileView =
       currentFeatureView = newFeatureView
 
     model.addObserver => container.updateByModel(model)
+
+    container.onClick = (event) ->
+      if event.nativeEvent.altKey
+        model.cycleFeature()
+      else
+        model.cycleTerrain()
 
     container
 

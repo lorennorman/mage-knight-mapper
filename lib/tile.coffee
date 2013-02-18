@@ -83,7 +83,7 @@ Tile.fromArray = (orderedProperties) ->
   Tile.fromNames(orderedProperties[0], orderedProperties[1])
 
 Tile.generateRandom = () ->
-  [Terrain.random(), Feature.random()]
+  [Terrain.random()]#, Feature.random()]
 
 
 MageKnight.Tile = Tile

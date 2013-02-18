@@ -1,53 +1,27 @@
 MageKnight =
   bootstrap: ->
     @terrainMesh ?= do ->
-      # make a stage
       stage = new createjs.Stage("demo")
-      stage.x = 190
-      stage.y = 180
-      stage.scaleX = stage.scaleY = .5
       stage.enableMouseOver()
-      # stage.rotation = 180
 
-      # make a terrain mesh
       terrainMesh = new MageKnight.TerrainMesh()
-      tileViews = new MageKnight.TileViewCache()
+      terrainMeshView = new MageKnight.TerrainMeshView(terrainMesh)
+      stage.addChild(terrainMeshView)
 
-      # bind the stage's view stack to the terrain mesh
-      terrainMesh.addObserver ->
-        stage.removeAllChildren()
-
-        for tile in terrainMesh.revealedTiles()
-          do (tile) ->
-            tileView = tileViews.findByModel(tile)
-            tileView.onClick = (event) ->
-              if event.nativeEvent.altKey
-                tile.cycleFeature()
-              else
-                tile.cycleTerrain()
-
-            stage.addChild(tileView)
-
-        for location in terrainMesh.revealableLocations()
-          do (location) ->
-            hintView = MageKnight.HintView.fromHexordinate(location)
-            hintView.onClick = ->
-              terrainMesh.addTile(location.array, MageKnight.Tile.generateRandom())
-
-            stage.addChild(hintView)
+      controlPanel = new MageKnight.ControlPanelView(terrainMeshView)
+      stage.addChild(controlPanel)
 
       setInterval ->
         stage.update()
-      , 50
+      , 150
 
       # return the terrain mesh
       terrainMesh
 
   startWithMegaTile: (tiles) ->
-    middleTile = MageKnight.Tile.fromNames(tiles[1][1][0], tiles[1][1][1])
-
     terrainMesh = @bootstrap()
 
+    middleTile = MageKnight.Tile.fromNames(tiles[1][1][0], tiles[1][1][1])
     terrainMesh.addFirstTile(middleTile)
     terrainMesh.addTile([0], [tiles[0][1][0], tiles[0][1][1]])
     terrainMesh.addTile([1], [tiles[1][2][0], tiles[1][2][1]])
