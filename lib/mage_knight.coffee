@@ -5,7 +5,7 @@ MageKnight =
       stage = new createjs.Stage("demo")
       stage.x = 190
       stage.y = 180
-      stage.scaleX = stage.scaleY = .20
+      stage.scaleX = stage.scaleY = .25
       stage.enableMouseOver()
       # stage.rotation = 180
 
@@ -14,27 +14,37 @@ MageKnight =
       tileViews = new MageKnight.TileViewCache()
 
       # bind the stage's view stack to the terrain mesh
-      terrainMesh.observers.push ->
+      terrainMesh.addObserver ->
         stage.removeAllChildren()
 
         for tile in terrainMesh.revealedTiles()
           do (tile) ->
-            # construct a graphical primitive to represent this tile
             tileView = tileViews.findByModel(tile)
-            # hand it off to the drawing system
+            tileView.onClick = (event) ->
+              if event.nativeEvent.altKey
+                tile.cycleFeature()
+              else
+                tile.cycleTerrain()
+
+              tileView.updateByModel(tile)
+              # tile.notifyObservers()
+
+              # tileViews.updateByModel(tile)
+              terrainMesh.notifyObservers()
+
             stage.addChild(tileView)
 
         for location in terrainMesh.revealableLocations()
           do (location) ->
-            #todo: generate all the hints here
+            hintView = MageKnight.HintView.fromHexordinate(location)
+            hintView.onClick = ->
+              terrainMesh.addTile(location.array, MageKnight.Tile.generateRandom())
 
-        # ensure the drawing system is running
-        stage.onMouseMove = ->
-          stage.update()
+            stage.addChild(hintView)
 
-        setTimeout ->
-          stage.update()
-        , 200
+      setInterval ->
+        stage.update()
+      , 50
 
       # return the terrain mesh
       terrainMesh

@@ -244,3 +244,460 @@ new ActiveXObject("Msxml2.XMLHTTP.3.0")}catch(e){try{d=new ActiveXObject("Msxml2
 var a=this._request;a.onloadstart=null;a.onprogress=null;a.onabort=null;a.onerror=null;a.onload=null;a.ontimeout=null;a.onloadend=null;a.onreadystatechange=null};a._generateTag=function(){var a=this._item.tag;switch(this._item.type){case createjs.LoadQueue.IMAGE:return a.onload=createjs.proxy(this._handleTagReady,this),a.src=this._item.src,this._rawResponse=this._response,this._response=a,!1;case createjs.LoadQueue.JAVASCRIPT:a=document.createElement("script");this._rawResponse=a.text=this._response;
 this._response=a;break;case createjs.LoadQueue.CSS:document.getElementsByTagName("head")[0].appendChild(a);if(a.styleSheet)a.styleSheet.cssText=this._response;else{var c=document.createTextNode(this._response);a.appendChild(c)}this._rawResponse=this._response;this._response=a;break;case createjs.LoadQueue.XML:this._response=c=this._parseXML(this._response,"text/xml");break;case createjs.LoadQueue.SVG:c=this._parseXML(this._response,"image/svg+xml");this._rawResponse=this._response;a.appendChild(c.documentElement);
 this._response=a;break;case createjs.LoadQueue.JSON:try{eval("json="+this._response)}catch(d){break}this._rawResponse=this._response;this._response={}}return!0};a._parseXML=function(a,c){var d=null;window.DOMParser?d=(new DOMParser).parseFromString(a,c):(d=new ActiveXObject("Microsoft.XMLDOM"),d.async=!1,d.loadXML(a));return d};a._handleTagReady=function(){this._sendComplete()};a.toString=function(){return"[PreloadJS XHRLoader]"};createjs.XHRLoader=c})();
+
+/*
+* ColorMatrixFilter
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2010 gskinner.com, inc.
+* 
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+* 
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
+
+/**
+ * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
+ * {{#crossLink "ColorMatrix"}}{{/crossLink}} for more information on changing colors.
+ *
+ * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters.
+ * @class ColorMatrixFilter
+ * @constructor
+ * @extends Filter
+ * @param {Array} matrix A 4x5 matrix describing the color operation to perform. See also the ColorMatrix class.
+ **/
+var ColorMatrixFilter = function(matrix) {
+  this.initialize(matrix);
+}
+var p = ColorMatrixFilter.prototype = new createjs.Filter();
+
+// public properties:
+  p.matrix = null;
+  
+// constructor:
+  // TODO: detailed docs.
+  /** 
+   * @method initialize
+   * @protected
+   * @param {Array} matrix A 4x5 matrix describing the color operation to perform.
+   **/
+  p.initialize = function(matrix) {
+    this.matrix = matrix;
+  }
+
+// public methods:
+  /**
+   * Applies the filter to the specified context.
+   * @method applyFilter
+   * @param {CanvasRenderingContext2D} ctx The 2D context to use as the source.
+   * @param {Number} x The x position to use for the source rect.
+   * @param {Number} y The y position to use for the source rect.
+   * @param {Number} width The width to use for the source rect.
+   * @param {Number} height The height to use for the source rect.
+   * @param {CanvasRenderingContext2D} targetCtx Optional. The 2D context to draw the result to. Defaults to the context passed to ctx.
+   * @param {Number} targetX Optional. The x position to draw the result to. Defaults to the value passed to x.
+   * @param {Number} targetY Optional. The y position to draw the result to. Defaults to the value passed to y.
+   * @return {Boolean}
+   **/
+  p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
+    targetCtx = targetCtx || ctx;
+    if (targetX == null) { targetX = x; }
+    if (targetY == null) { targetY = y; }
+    try {
+      var imageData = ctx.getImageData(x, y, width, height);
+    } catch(e) {
+      //if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
+      return false;
+    }
+    var data = imageData.data;
+    var l = data.length;
+    var r,g,b,a;
+    var mtx = this.matrix;
+    var m0 =  mtx[0],  m1 =  mtx[1],  m2 =  mtx[2],  m3 =  mtx[3],  m4 =  mtx[4];
+    var m5 =  mtx[5],  m6 =  mtx[6],  m7 =  mtx[7],  m8 =  mtx[8],  m9 =  mtx[9];
+    var m10 = mtx[10], m11 = mtx[11], m12 = mtx[12], m13 = mtx[13], m14 = mtx[14];
+    var m15 = mtx[15], m16 = mtx[16], m17 = mtx[17], m18 = mtx[18], m19 = mtx[19];
+    
+    for (var i=0; i<l; i+=4) {
+      r = data[i];
+      g = data[i+1];
+      b = data[i+2];
+      a = data[i+3];
+      data[i] = r*m0+g*m1+b*m2+a*m3+m4; // red
+      data[i+1] = r*m5+g*m6+b*m7+a*m8+m9; // green
+      data[i+2] = r*m10+g*m11+b*m12+a*m13+m14; // blue
+      data[i+3] = r*m15+g*m16+b*m17+a*m18+m19; // alpha
+    }
+    imageData.data = data;
+    targetCtx.putImageData(imageData, targetX, targetY);
+    return true;
+  }
+
+  /**
+   * Returns a string representation of this object.
+   * @method toString
+   * @return {String} a string representation of the instance.
+   **/
+  p.toString = function() {
+    return "[ColorMatrixFilter]";
+  }
+  
+  
+  /**
+   * Returns a clone of this ColorMatrixFilter instance.
+   * @method clone
+   * @return {ColorMatrixFilter} A clone of the current ColorMatrixFilter instance.
+   **/
+  p.clone = function() {
+    return new ColorMatrixFilter(this.matrix);
+  }
+  
+createjs.ColorMatrixFilter = ColorMatrixFilter;
+}());
+
+/*
+* ColorMatrix
+* Visit http://createjs.com/ for documentation, updates and examples.
+*
+* Copyright (c) 2010 gskinner.com, inc.
+* 
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation
+* files (the "Software"), to deal in the Software without
+* restriction, including without limitation the rights to use,
+* copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the
+* Software is furnished to do so, subject to the following
+* conditions:
+* 
+* The above copyright notice and this permission notice shall be
+* included in all copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+* OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+* NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+* HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+* OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+// namespace:
+this.createjs = this.createjs||{};
+
+(function() {
+  
+  /**
+   * Provides helper functions for assembling a matrix for use with the {{#crossLink "ColorMatrixFilter"}}{{/crossLink}},
+   * or can be used directly as the matrix for a ColorMatrixFilter. Most methods return the instance to facilitate
+   * chained calls.
+   *
+   * <h4>Example</h4>
+   *      myColorMatrix.adjustHue(20).adjustBrightness(50);
+   *
+   * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters.
+   * @class ColorMatrix
+   * @constructor
+   * @extends Array
+   * @param {Number} brightness
+   * @param {Number} contrast
+   * @param {Number} saturation
+   * @param {Number} hue
+   **/
+  ColorMatrix = function(brightness, contrast, saturation, hue) {
+    this.initialize(brightness, contrast, saturation, hue);
+  };
+  var p = ColorMatrix.prototype = [];
+  
+  /**
+   * Array of delta values for contrast calculations.
+   * @property DELTA_INDEX
+   * @type Array
+   * @static
+   **/
+  ColorMatrix.DELTA_INDEX = [
+    0,    0.01, 0.02, 0.04, 0.05, 0.06, 0.07, 0.08, 0.1,  0.11,
+    0.12, 0.14, 0.15, 0.16, 0.17, 0.18, 0.20, 0.21, 0.22, 0.24,
+    0.25, 0.27, 0.28, 0.30, 0.32, 0.34, 0.36, 0.38, 0.40, 0.42,
+    0.44, 0.46, 0.48, 0.5,  0.53, 0.56, 0.59, 0.62, 0.65, 0.68, 
+    0.71, 0.74, 0.77, 0.80, 0.83, 0.86, 0.89, 0.92, 0.95, 0.98,
+    1.0,  1.06, 1.12, 1.18, 1.24, 1.30, 1.36, 1.42, 1.48, 1.54,
+    1.60, 1.66, 1.72, 1.78, 1.84, 1.90, 1.96, 2.0,  2.12, 2.25, 
+    2.37, 2.50, 2.62, 2.75, 2.87, 3.0,  3.2,  3.4,  3.6,  3.8,
+    4.0,  4.3,  4.7,  4.9,  5.0,  5.5,  6.0,  6.5,  6.8,  7.0,
+    7.3,  7.5,  7.8,  8.0,  8.4,  8.7,  9.0,  9.4,  9.6,  9.8, 
+    10.0
+  ];
+  
+  /**
+   * Identity matrix values.
+   * @property IDENTITY_MATRIX
+   * @type Array
+   * @static
+   **/
+  ColorMatrix.IDENTITY_MATRIX = [
+    1,0,0,0,0,
+    0,1,0,0,0,
+    0,0,1,0,0,
+    0,0,0,1,0,
+    0,0,0,0,1
+  ];
+  
+  /**
+   * The constant length of a color matrix.
+   * @property LENGTH
+   * @type Number
+   * @static
+   **/
+  ColorMatrix.LENGTH = ColorMatrix.IDENTITY_MATRIX.length;
+  
+  
+  /**
+   * Initialization method.
+   * @method initialize
+   * @protected
+   */
+  p.initialize = function(brightness,contrast,saturation,hue) {
+    this.reset();
+    this.adjustColor(brightness,contrast,saturation,hue);
+    return this;
+  };
+  
+  /**
+   * Resets the matrix to identity values.
+   * @method reset
+   * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+   */
+  p.reset = function() {
+    return this.copyMatrix(ColorMatrix.IDENTITY_MATRIX);
+  };
+  
+  /**
+   * Shortcut method to adjust brightness, contrast, saturation and hue.
+   * Equivalent to calling adjustHue(hue), adjustContrast(contrast),
+   * adjustBrightness(brightness), adjustSaturation(saturation), in that order.
+   * @param {Number} brightness
+   * @param {Number} contrast
+   * @param {Number} saturation
+   * @param {Number} hue
+   * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+   **/
+  p.adjustColor = function(brightness,contrast,saturation,hue) {
+    this.adjustHue(hue);
+    this.adjustContrast(contrast);
+    this.adjustBrightness(brightness);
+    return this.adjustSaturation(saturation);
+  };
+  
+  /**
+   * Adjusts the brightness of pixel color by adding the specified value to the red, green and blue channels.
+   * Positive values will make the image brighter, negative values will make it darker.
+   * @param {Number} value A value between -255 & 255 that will be added to the RGB channels.
+   * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+   **/
+  p.adjustBrightness = function(value) {
+    if (value == 0 || isNaN(value)) { return this; }
+    value = this._cleanValue(value,255);
+    this._multiplyMatrix([
+      1,0,0,0,value,
+      0,1,0,0,value,
+      0,0,1,0,value,
+      0,0,0,1,0,
+      0,0,0,0,1
+    ]);
+    return this;
+  },
+  
+  /**
+   * Adjusts the contrast of pixel color.
+   * Positive values will increase contrast, negative values will decrease contrast.
+   * @param {Number} value A value between -100 & 100.
+   * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+   **/
+  p.adjustContrast = function(value) {
+    if (value == 0 || isNaN(value)) { return this; }
+    value = this._cleanValue(value,100);
+    var x;
+    if (value<0) {
+      x = 127+value/100*127;
+    } else {
+      x = value%1;
+      if (x == 0) {
+        x = ColorMatrix.DELTA_INDEX[value];
+      } else {
+        x = ColorMatrix.DELTA_INDEX[(value<<0)]*(1-x)+ColorMatrix.DELTA_INDEX[(value<<0)+1]*x; // use linear interpolation for more granularity.
+      }
+      x = x*127+127;
+    }
+    this._multiplyMatrix([
+      x/127,0,0,0,0.5*(127-x),
+      0,x/127,0,0,0.5*(127-x),
+      0,0,x/127,0,0.5*(127-x),
+      0,0,0,1,0,
+      0,0,0,0,1
+    ]);
+    return this;
+  };
+  
+  /**
+   * Adjusts the color saturation of the pixel.
+   * Positive values will increase saturation, negative values will decrease saturation (trend towards greyscale).
+   * @param {Number} value A value between -100 & 100.
+   * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+   **/
+  p.adjustSaturation = function(value) {
+    if (value == 0 || isNaN(value)) { return this; }
+    value = this._cleanValue(value,100);
+    var x = 1+((value > 0) ? 3*value/100 : value/100);
+    var lumR = 0.3086;
+    var lumG = 0.6094;
+    var lumB = 0.0820;
+    this._multiplyMatrix([
+      lumR*(1-x)+x,lumG*(1-x),lumB*(1-x),0,0,
+      lumR*(1-x),lumG*(1-x)+x,lumB*(1-x),0,0,
+      lumR*(1-x),lumG*(1-x),lumB*(1-x)+x,0,0,
+      0,0,0,1,0,
+      0,0,0,0,1
+    ]);
+    return this;
+  };
+  
+  
+  /**
+   * Adjusts the hue of the pixel color.
+   * @param {Number} value A value between -180 & 180.
+   * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+   **/
+  p.adjustHue = function(value) {
+    if (value == 0 || isNaN(value)) { return this; }
+    value = this._cleanValue(value,180)/180*Math.PI;
+    var cosVal = Math.cos(value);
+    var sinVal = Math.sin(value);
+    var lumR = 0.213;
+    var lumG = 0.715;
+    var lumB = 0.072;
+    this._multiplyMatrix([
+      lumR+cosVal*(1-lumR)+sinVal*(-lumR),lumG+cosVal*(-lumG)+sinVal*(-lumG),lumB+cosVal*(-lumB)+sinVal*(1-lumB),0,0,
+      lumR+cosVal*(-lumR)+sinVal*(0.143),lumG+cosVal*(1-lumG)+sinVal*(0.140),lumB+cosVal*(-lumB)+sinVal*(-0.283),0,0,
+      lumR+cosVal*(-lumR)+sinVal*(-(1-lumR)),lumG+cosVal*(-lumG)+sinVal*(lumG),lumB+cosVal*(1-lumB)+sinVal*(lumB),0,0,
+      0,0,0,1,0,
+      0,0,0,0,1
+    ]);
+    return this;
+  };
+  
+  /**
+   * Concatenates (multiplies) the specified matrix with this one.
+   * @param {Array} matrix An array or ColorMatrix instance.
+   * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+   **/
+  p.concat = function(matrix) {
+    matrix = this._fixMatrix(matrix);
+    if (matrix.length != ColorMatrix.LENGTH) { return this; }
+    this._multiplyMatrix(matrix);
+    return this;
+  };
+  
+  /**
+   * Returns a clone of this ColorMatrix.
+   * @return {ColorMatrix} A clone of this ColorMatrix.
+   **/
+  p.clone = function() {
+    return new ColorMatrix(this);
+  };
+  
+  /**
+   * Return a length 25 (5x5) array instance containing this matrix's values.
+   * @return {Array} An array holding this matrix's values.
+   **/
+  p.toArray = function() {
+    return this.slice(0,ColorMatrix.LENGTH);
+  };
+  
+  /**
+   * Copy the specified matrix's values to this matrix.
+   * @param {Array} matrix An array or ColorMatrix instance.
+   * @return {ColorMatrix} The ColorMatrix instance the method is called on (useful for chaining calls.)
+   **/
+  p.copyMatrix = function(matrix) {
+    var l = ColorMatrix.LENGTH;
+    for (var i=0;i<l;i++) {
+      this[i] = matrix[i];
+    }
+    return this;
+  };
+  
+// private methods:
+  
+  /**
+   * @method _multiplyMatrix
+   * @protected
+   **/
+  p._multiplyMatrix = function(matrix) {
+    var col = [];
+    
+    for (var i=0;i<5;i++) {
+      for (var j=0;j<5;j++) {
+        col[j] = this[j+i*5];
+      }
+      for (var j=0;j<5;j++) {
+        var val=0;
+        for (var k=0;k<5;k++) {
+          val += matrix[j+k*5]*col[k];
+        }
+        this[j+i*5] = val;
+      }
+    }
+  };
+  
+  /**
+   * Make sure values are within the specified range, hue has a limit of 180, brightness is 255, others are 100.
+   * @method _cleanValue
+   * @protected
+   **/
+  p._cleanValue = function(value,limit) {
+    return Math.min(limit,Math.max(-limit,value));
+  };
+  
+  // 
+  /**
+   * Makes sure matrixes are 5x5 (25 long).
+   * @method _fixMatrix
+   * @protected
+   **/
+  p._fixMatrix = function(matrix) {
+    if (matrix instanceof ColorMatrix) { matrix = matrix.slice(0); }
+    if (matrix.length < ColorMatrix.LENGTH) {
+      matrix = matrix.slice(0,matrix.length).concat(ColorMatrix.IDENTITY_MATRIX.slice(matrix.length,ColorMatrix.LENGTH));
+    } else if (matrix.length > ColorMatrix.LENGTH) {
+      matrix = matrix.slice(0,ColorMatrix.LENGTH);
+    }
+    return matrix;
+  };
+  
+  createjs.ColorMatrix = ColorMatrix;
+
+}());

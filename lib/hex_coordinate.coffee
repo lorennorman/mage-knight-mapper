@@ -5,7 +5,7 @@ class HexCoordinate
     @array = HexCoordinate.validate(array)
 
   toString: ->
-    @array.join()
+    "Hexordinate[#{@array.join()}]"
 
   getAdjacencies: () ->
     [
@@ -18,6 +18,7 @@ class HexCoordinate
     ]
     
 HexCoordinate.validate = (array) ->
+  array = array.array or array
   coordinates = [0..5]
 
   isValidCoordinate = (el) ->

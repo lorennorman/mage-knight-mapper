@@ -55,17 +55,18 @@ class TerrainMesh
 
     neighbors = neighbors.filter (neighbor) => @tiles[neighbor]?
     throw "Failure adding a tile at #{hexordinate}: no neighbors" if neighbors.length is 0
-    # add to neighbor relationship mesh
-    # @reciprocateNeighbors(neighbor, newTile) for neighbor in neighbors
 
     @tiles[hexordinate.array] = newTile
     @notifyObservers()
 
-  # reciprocateNeighbors: (neighborA, neighborB) ->
-  #   neighborA.addNeighborAt(neighborIndex, newTile)
-  #   newTile.addNeighborAt((neighborIndex+3)%6, parentTile)
+  addObserver: (observer) ->
+    @observers.push observer
+    @notifyObserver(observer)
 
   notifyObservers: () ->
-    observer.notify?() or observer() for observer in @observers
+    @notifyObserver(observer) for observer in @observers
+
+  notifyObserver: (observer) ->
+    observer.notify?() or observer()
 
 MageKnight.TerrainMesh = TerrainMesh
