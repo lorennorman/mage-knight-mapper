@@ -1,4 +1,6 @@
 <style>
+  body { margin: 0; }
+
   canvas {
     width: 100%;
     height: 100%;
@@ -6,29 +8,19 @@
 </style>
 
 <script src='/jquery.js'></script>
+<script src='/underscore.js'></script>
 <script src='/create.js'></script>
 <script src='/mage_knight.js'></script>
 
 <script>
   $(function() {
     MageKnight.startWithMegaTile([
-               [ [ "grass", "village" ], [ "forest" ] ],
-      [ [ "water" ], [ "grass", "portal" ], [ "grass" ] ],
-               [ [ "water" ], [ "grass", "orcs" ] ]
+       [ [ "grass", "village" ], [ "forest", "glade" ] ],
+      [ [ "hill" ], [ "grass", "portal" ], [ "grass" ] ],
+                [ [ "water" ], [ "water" ] ]
     ]);
 
-    terrainMesh = MageKnight.bootstrap()
-    terrainMesh.addTile([0, 0],    ["forest", "keep"])
-    terrainMesh.addTile([0, 5],    ["mountain"])
-    terrainMesh.addTile([0, 0, 1], ["forest", "fortress"])
-    terrainMesh.addTile([1, 1],    ["swamp"])
-    terrainMesh.addTile([1, 1, 1], ["hill",   "glade"])
-    terrainMesh.addTile([1, 1, 2], ["grass",  "monastery"])
-    terrainMesh.addTile([1, 2],    ["water"])
-    terrainMesh.addTile([1, 2, 2], ["water"])
-    terrainMesh.addTile([1, 2, 3], ["water"])
-    terrainMesh.addTile([2, 3],    ["water"])
-    terrainMesh.addTile([4, 3],    ["desert", "magetower"])
+
   });
 </script>
 
