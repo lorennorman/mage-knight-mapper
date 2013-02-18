@@ -5,7 +5,7 @@ MageKnight =
       stage = new createjs.Stage("demo")
       stage.x = 190
       stage.y = 180
-      stage.scaleX = stage.scaleY = .25
+      stage.scaleX = stage.scaleY = .5
       stage.enableMouseOver()
       # stage.rotation = 180
 
@@ -25,12 +25,6 @@ MageKnight =
                 tile.cycleFeature()
               else
                 tile.cycleTerrain()
-
-              tileView.updateByModel(tile)
-              # tile.notifyObservers()
-
-              # tileViews.updateByModel(tile)
-              terrainMesh.notifyObservers()
 
             stage.addChild(tileView)
 

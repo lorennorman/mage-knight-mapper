@@ -71,8 +71,9 @@ TileView =
         terrainView.scaleX = .64
         terrainView.scaleY = .7
     else
+      console.log "missing #{terrain} file"
       terrainView = new createjs.Shape()
-      terrainView.graphics.beginFill(@terrainColorMap[terrain]).drawCircle(118, 138, 120)
+      terrainView.graphics.beginFill("red").drawCircle(0, 0, 90)
 
     terrainView
 
@@ -137,12 +138,13 @@ TileView =
 HintView =
   fromHexordinate: (hexordinate) ->
     hintView = new createjs.Shape()
-    hintView.graphics.beginFill("#FFF").drawCircle(78, 104, 50)
-    [hintView.x, hintView.y] = TileView.transformByParity([0, 0], hexordinate)
+    centerPoint = [TileView.width/2, TileView.height/2]
+    hintView.graphics.beginFill("#FFF").drawCircle(0, 0, 60)
+    [hintView.x, hintView.y] = TileView.transformByParity(centerPoint, hexordinate)
     
     hintOver = new createjs.Shape()
-    hintOver.graphics.beginStroke("green").drawCircle(78, 104, 50)
-    [hintOver.x, hintOver.y] = TileView.transformByParity([0, 0], hexordinate)
+    hintOver.graphics.beginStroke("green").drawCircle(0, 0, 50)
+    [hintOver.x, hintOver.y] = TileView.transformByParity(centerPoint, hexordinate)
 
     container = new createjs.Container()
     container.addChild(hintView)
