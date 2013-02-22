@@ -2,7 +2,7 @@ class MageKnight.TerrainMeshView extends createjs.Container
   constructor: (@model) ->
     super()
     @x = @y = 200
-    @scaleX = @scaleY = .25
+    @scaleX = @scaleY = .5
 
     @tileViewFactory = new MageKnight.TileViewCache()
 

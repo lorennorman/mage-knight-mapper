@@ -10,16 +10,6 @@ TileView =
     4: [-2, 0]
     5: [-1, -1]
 
-  terrainColorMap:
-    grass: "green"
-    desert: "yellow"
-    mountain: "darkblue"
-    wasteland: "#444"
-    water: "lightblue"
-    hill: "brown"
-    rock: "darkbrown"
-    swamp: "darkgreen"
-
   terrainFileMap:
     grass: "grass"
     desert: "desert"
@@ -30,38 +20,29 @@ TileView =
     swamp: "swamp"
     wasteland: "wasteland"
 
-  featureColorMap:
-    orcs: "green"
-    draconum: "red"
-    keep: "lightgray"
-    magetower: "purple"
-    dungeon: "lightbrown"
-    tomb: "lightbrown"
-    monsterden: "darkbrown"
-    spawninggrounds: "darkbrown"
-    village: "orange"
-    monastery: "orange"
-    city: "white"
-    ruins: "yellow"
-    mines: "brown"
-    glade: "violet"
-    portal: "pink"
-
   featureFileMap:
-    keep: "keep"
     portal: "portal"
-    monastery: "monastery"
-    orcs: "orcs"
-    glade: "glade"
-    magetower: "magetower"
     village: "village"
+    monastery: "monastery"
+    glade: "glade"
+    minered: "crystalmine_red"
+    mineblue: "crystalmine_blue"
+    minegreen: "crystalmine_green"
+    minewhite: "crystalmine_white"
+    orcs: "orcs"
+    draconum: "draconom"
+    keep: "keep"
+    magetower: "magetower"
     ruins: "ruins"
     dungeon: "dungeon"
-    mine: "crystalmine"
-    draconum: "draconom"
+    tomb: "tomb"
     monsterden: "monsterden"
     spawninggrounds: "spawning1"
-    tomb: "tomb"
+    # spawninggrounds2: "spawning2"
+    cityred: "city_red"
+    cityblue: "city_blue"
+    citygreen: "city_green"
+    citywhite: "city_white"
 
   getTerrainView: (terrain) ->
     if @terrainFileMap[terrain]?

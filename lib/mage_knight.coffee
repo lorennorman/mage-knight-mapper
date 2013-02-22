@@ -11,9 +11,9 @@ MageKnight =
       controlPanel = new MageKnight.ControlPanelView(terrainMeshView)
       stage.addChild(controlPanel)
 
-      setInterval ->
-        stage.update()
-      , 150
+      createjs.Ticker.useRAF = true
+      createjs.Ticker.setFPS(5)
+      createjs.Ticker.addEventListener "tick", -> stage.update()
 
       # return the terrain mesh
       terrainMesh

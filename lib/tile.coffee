@@ -17,10 +17,12 @@ Terrain =
 
 Feature =
   types: [
-    null, "orcs", "village", "glade", "monastery", "keep",
-    "magetower", "ruins", "dungeon", "monsterden", "tomb",
-    "draconum", "mine", "spawninggrounds"
-    #"city"
+    null, "village", "glade", "monastery",
+    "minegreen", "minered", "mineblue", "minewhite",
+    "orcs", "draconum",
+    "keep", "magetower",
+    "ruins", "dungeon", "tomb", "monsterden", "spawninggrounds",
+    "cityblue", "cityred", "citygreen", "citywhite"
   ]
 
   next: (type) ->
