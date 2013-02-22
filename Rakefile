@@ -11,7 +11,7 @@ task :build do |t|
     concat_libs << compiled_js unless concat_libs.include?(compiled_js)
   end
 
-  File.write "./lib/build/#{library_name}.js", concat_libs.join("\n")
+  File.write "./public/build/#{library_name}.js", concat_libs.join("\n")
 end
 
 task :default => :build
