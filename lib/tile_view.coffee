@@ -1,5 +1,7 @@
-TileView =
+Loader =
   filePath: ""
+
+TileView =
   width: 150
   height: 196
 
@@ -47,7 +49,7 @@ TileView =
 
   getTerrainView: (terrain) ->
     if @terrainFileMap[terrain]?
-      terrainView = new createjs.Bitmap("#{@filePath}terrain/#{@terrainFileMap[terrain]}.png")
+      terrainView = new createjs.Bitmap("#{Loader.filePath}terrain/#{@terrainFileMap[terrain]}.png")
     else
       console.log "missing #{terrain} file"
       terrainView = new createjs.Shape()
@@ -57,7 +59,7 @@ TileView =
 
   getFeatureView: (feature) ->
     if @featureFileMap[feature]?
-      featureView = new createjs.Bitmap("#{@filePath}feature/#{@featureFileMap[feature]}.png")
+      featureView = new createjs.Bitmap("#{Loader.filePath}feature/#{@featureFileMap[feature]}.png")
     else
       console.log "missing #{feature} file"
       terrainView = new createjs.Shape()
@@ -147,6 +149,7 @@ class TileViewCache
     @_tileViews[model.position.array] ?= TileView.fromModel(model)
     @_tileViews[model.position.array]
 
+MageKnight.Loader = Loader
 MageKnight.TileView = TileView
 MageKnight.HintView = HintView
 MageKnight.TileViewCache = TileViewCache
