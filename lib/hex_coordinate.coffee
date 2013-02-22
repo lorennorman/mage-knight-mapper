@@ -4,6 +4,9 @@ class HexCoordinate
   constructor: (array) ->
     @array = HexCoordinate.validate(array)
 
+  isOrigin: ->
+    @array.length is 0
+
   toString: ->
     "Hexordinate[#{@array.join()}]"
 

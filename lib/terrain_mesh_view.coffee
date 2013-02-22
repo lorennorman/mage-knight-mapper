@@ -27,6 +27,6 @@ class MageKnight.TerrainMeshView extends createjs.Container
       do (location) =>
         hintView = MageKnight.HintView.fromHexordinate(location)
         hintView.onClick = =>
-          @model.addTile(location.array, MageKnight.Tile.generateRandom())
+          @model.addTile(location, MageKnight.Tile.generateRandom())
 
         @addChild(hintView)

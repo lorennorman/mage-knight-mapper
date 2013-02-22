@@ -1,4 +1,37 @@
 describe 'TerrainMesh', ->
+  describe 'serialization', ->
+    it 'serializes to an object', ->
+      mock1 =
+        toObject: -> "mock1"
+      mock2 =
+        toObject: -> "mock2"
+
+      mesh = new MageKnight.TerrainMesh()
+      mesh.addTile(new MageKnight.HexCoordinate([]), mock1)
+      mesh.addTile(new MageKnight.HexCoordinate([0]), mock2)
+
+      meshObject = mesh.toObject()
+
+      (expect meshObject.tiles).to.contain("mock1")
+      (expect meshObject.tiles).to.contain("mock2")
+
+    it 'deserializes from an object', ->
+      terrainMeshObject =
+        tiles: [
+          terrain: "grass"
+          feature: "keep"
+          position: []
+        , 
+          terrain: "desert"
+          position: [0]
+        ]
+
+      mesh = MageKnight.TerrainMesh.fromObject(terrainMeshObject)
+
+      console.log mesh.tiles
+      (expect mesh.getOriginTile().feature).to.be "keep"
+      (expect mesh.getTileAt([0]).terrain).to.be "desert"
+
   it 'recalls its first tile', ->
     tile =
       firstTile: false
@@ -10,7 +43,7 @@ describe 'TerrainMesh', ->
  
   it 'adds the first tile just once', ->
     mesh = new MageKnight.TerrainMesh
-    addTile = -> mesh.addFirstTile(["grass"])
+    addTile = -> mesh.addFirstTile(new MageKnight.Tile("grass"))
     addTile()
     (expect addTile).to.throwException()
 
@@ -19,8 +52,8 @@ describe 'TerrainMesh', ->
 
     mesh = new MageKnight.TerrainMesh
     mesh.addFirstTile({})
-    mesh.addTile([1], {})
-    mesh.addTile([1, 1], tile)
+    mesh.easyAddTile([1], {})
+    mesh.easyAddTile([1, 1], tile)
     
     (expect mesh.getTileAt([1, 1]).terrain).to.be "hill"
 
@@ -33,5 +66,5 @@ describe 'TerrainMesh', ->
     mesh = new MageKnight.TerrainMesh
     mesh.addFirstTile({})
     (expect mesh.revealableLocations().length).to.be(6)
-    mesh.addTile([1], {})
+    mesh.easyAddTile([1], {})
     (expect mesh.revealableLocations().length).to.be(10)

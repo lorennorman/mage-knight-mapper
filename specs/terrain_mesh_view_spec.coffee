@@ -4,5 +4,5 @@ describe "TerrainMeshView", ->
       called: false
       addObserver: () -> @called = true
 
-    new MageKnight.TerrainMeshView(null, mock)
+    new MageKnight.TerrainMeshView(mock)
     (expect mock.called).to.be(true)

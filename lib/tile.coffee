@@ -39,13 +39,17 @@ Feature =
 class Tile
   constructor: (@terrain, @feature=null) ->
     @position = []
-    @neighbors = []
     @firstTile = false
     @mesh = null
     @observers = []
 
   isFirstTile: ->
     @firstTile
+
+  toObject: ->
+    terrain: @terrain
+    feature: @feature
+    position: @position.array
 
   cycleTerrain: () ->
     @terrain = Terrain.next(@terrain)
@@ -85,8 +89,12 @@ Tile.fromArray = (orderedProperties) ->
   Tile.fromNames(orderedProperties[0], orderedProperties[1])
 
 Tile.generateRandom = () ->
-  [Terrain.random()]#, Feature.random()]
+  new Tile Terrain.random()#, Feature.random()]
 
+Tile.fromObject = (tileObject) ->
+  tile = new Tile(tileObject.terrain, tileObject.feature)
+  tile.position = new MageKnight.HexCoordinate(tileObject.position)
+  tile
 
 MageKnight.Tile = Tile
 MageKnight.Terrain = Terrain

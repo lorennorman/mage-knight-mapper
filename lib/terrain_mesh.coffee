@@ -3,26 +3,27 @@ class TerrainMesh
     @tiles = {}
     @observers = []
 
-  revealedTiles: () ->
-    tile for location, tile of @tiles
+  toObject: ->
+    tileObjects = (tile.toObject() for index, tile of @tiles)
+    return tiles: tileObjects
+
+  revealedTiles: () -> tile for location, tile of @tiles
 
   revealableLocations: () ->
     # turn tiles into their adjacencies
     adjacencies = @revealedTiles().map (tile) -> tile.position.getAdjacencies()
-
     # concatenate them all together
     adjacencies = adjacencies.reduce (acc, adjs) ->
       acc.concat(adjs)
     , []
-
     # drop all the locations where a tile already is
     adjacencies = adjacencies.filter (adj) => not @tiles[adj.array]?
-
-    # de-duple this array
+    # de-dupe this array
     # TODO
 
   addFirstTile: (tile) ->
-    throw "Tiles are already started, you can only add tiles at hex coordinates from origin now" if @_originTile?
+    if @_originTile?
+      throw "Tiles are already started, you can only add tiles at hex coordinates from origin now"
 
     coordinates = new MageKnight.HexCoordinate([])
     tile.position = coordinates
@@ -39,11 +40,16 @@ class TerrainMesh
   getTileAt: (hexordinateLiteral) ->
     @tiles[MageKnight.HexCoordinate.validate(hexordinateLiteral)]
 
-  addTile: (hexordinateLiteral, tileProperties=["grass"]) ->
+  easyAddTile: (hexordinateLiteral, tileProperties=["grass"]) ->
     hexordinate = new MageKnight.HexCoordinate(hexordinateLiteral)
-    newTile = MageKnight.Tile.fromArray(tileProperties)
-    newTile.position = hexordinate
-    newTile.mesh = this
+    tile = MageKnight.Tile.fromArray(tileProperties)
+    @addTile(hexordinate, tile)
+
+  addTile: (hexordinate, tile) ->
+    return @addFirstTile(tile) if not @getOriginTile() and hexordinate.isOrigin()
+
+    tile.position = hexordinate
+    tile.mesh = this
 
     # check coordinate for vacancy or throw
     throw "Already a tile at #{hexordinate}" if @tiles[hexordinate.array]?
@@ -54,9 +60,9 @@ class TerrainMesh
         neighbors.push neighborHex.array 
 
     neighbors = neighbors.filter (neighbor) => @tiles[neighbor]?
-    throw "Failure adding a tile at #{hexordinate}: no neighbors" if neighbors.length is 0
+    throw new Error("Failure adding a tile at #{hexordinate}: no neighbors") if neighbors.length is 0
 
-    @tiles[hexordinate.array] = newTile
+    @tiles[hexordinate.array] = tile
     @notifyObservers()
 
   addObserver: (observer) ->
@@ -68,5 +74,23 @@ class TerrainMesh
 
   notifyObserver: (observer) ->
     observer.notify?() or observer()
+
+TerrainMesh.fromObject = (object) ->
+  mesh = new TerrainMesh()
+
+  tileObjects = (_ object.tiles).sortBy (tile) -> tile.position.length
+  tiles = (MageKnight.Tile.fromObject(tileObject) for tileObject in tileObjects)
+  tiles = (_ tiles).sortBy (tile) -> tile.position.array.length
+
+  firstTile = tiles.shift()
+  throw "Why isn't the first tile an origin tile?" unless firstTile.position.isOrigin()
+
+  mesh.addFirstTile(firstTile)
+
+  for tile in tiles
+    do (tile) ->    
+      mesh.addTile(tile.position, tile)
+
+  mesh
 
 MageKnight.TerrainMesh = TerrainMesh
