@@ -1,4 +1,5 @@
 TileView =
+  filePath: ""
   width: 150
   height: 196
 
@@ -46,7 +47,7 @@ TileView =
 
   getTerrainView: (terrain) ->
     if @terrainFileMap[terrain]?
-      terrainView = new createjs.Bitmap("terrain/#{@terrainFileMap[terrain]}.png")
+      terrainView = new createjs.Bitmap("#{@filePath}terrain/#{@terrainFileMap[terrain]}.png")
     else
       console.log "missing #{terrain} file"
       terrainView = new createjs.Shape()
@@ -56,7 +57,7 @@ TileView =
 
   getFeatureView: (feature) ->
     if @featureFileMap[feature]?
-      featureView = new createjs.Bitmap("feature/#{@featureFileMap[feature]}.png")
+      featureView = new createjs.Bitmap("#{@filePath}feature/#{@featureFileMap[feature]}.png")
     else
       console.log "missing #{feature} file"
       terrainView = new createjs.Shape()
