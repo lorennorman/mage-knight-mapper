@@ -595,7 +595,11 @@
 }).call(this);
 
 (function() {
-  var HintView, TileView, TileViewCache;
+  var HintView, Loader, TileView, TileViewCache;
+
+  Loader = {
+    filePath: ""
+  };
 
   TileView = {
     width: 150,
@@ -644,7 +648,7 @@
     getTerrainView: function(terrain) {
       var terrainView;
       if (this.terrainFileMap[terrain] != null) {
-        terrainView = new createjs.Bitmap("terrain/" + this.terrainFileMap[terrain] + ".png");
+        terrainView = new createjs.Bitmap("" + Loader.filePath + "terrain/" + this.terrainFileMap[terrain] + ".png");
       } else {
         console.log("missing " + terrain + " file");
         terrainView = new createjs.Shape();
@@ -655,7 +659,7 @@
     getFeatureView: function(feature) {
       var featureView, terrainView;
       if (this.featureFileMap[feature] != null) {
-        featureView = new createjs.Bitmap("feature/" + this.featureFileMap[feature] + ".png");
+        featureView = new createjs.Bitmap("" + Loader.filePath + "feature/" + this.featureFileMap[feature] + ".png");
       } else {
         console.log("missing " + feature + " file");
         terrainView = new createjs.Shape();
@@ -774,6 +778,8 @@
     return TileViewCache;
 
   })();
+
+  MageKnight.Loader = Loader;
 
   MageKnight.TileView = TileView;
 
