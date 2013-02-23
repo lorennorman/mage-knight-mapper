@@ -1,76 +1,48 @@
 class ControlPanelView extends createjs.Container
-  constructor: (mapView) ->
+  constructor: (@cameraView, newButton) ->
     super()
     @dimensions =
-      x: 580
+      x: 460
       y: 0
-      width: 60
+      width: 180
       height: 480
+
+    @collapsedCoordinates =
+      x: 620
+      y: 0
+
+    @hidden = true
 
     @doLayout()
     @addBackground()
-    @addCameraButtons(mapView)
+    @addHideShowButton()
+    @addCamera()
+
+    newButton.x = 30
+    newButton.y = @dimensions.height - 30
+    @addChild(newButton)
 
   doLayout: () ->
-    @x = @dimensions.x
-    @y = @dimensions.y
+    if @hidden
+      @x = @collapsedCoordinates.x
+      @y = @collapsedCoordinates.y
+    else
+      @x = @dimensions.x
+      @y = @dimensions.y
 
   addBackground: () ->
     shape = new createjs.Shape()
     shape.graphics.beginFill("lightgray").drawRect(0, 0, @dimensions.width, @dimensions.height)
+    shape.alpha = 0.4
     @addChild(shape)
 
-  addCameraButtons: (mapView) ->
-    left = new Button("<", -> mapView.x -= 50)
-    left.x = 0
-    left.y = 40
-    right = new Button(">", -> mapView.x += 50)
-    right.x = 40
-    right.y = 40
-    up = new Button("^", -> mapView.y -= 50)
-    up.x = 20
-    up.y = 25
-    down = new Button("V", -> mapView.y += 50)
-    down.x = 20
-    down.y = 55
+  addHideShowButton: () ->
+    hsButton = new MageKnight.Button(" ||", => @hidden = !@hidden; @doLayout())
+    hsButton.y = @dimensions.height/2
+    @addChild(hsButton)
 
-    zoomIn = new Button "+", ->
-      mapView.scaleX = mapView.scaleY *= 1.1
-    zoomIn.x = 10
-
-    zoomOut = new Button "-", ->
-      mapView.scaleX = mapView.scaleY *= .9
-    zoomOut.x = 35
-
-    @addChild(left, right, up, down, zoomIn, zoomOut)
-
-class Button extends createjs.Container
-  constructor: (text, trigger) ->
-    super()
-
-    background = new createjs.Shape()
-    background.graphics.beginFill("666").drawCircle(10, 10, 10)
-    @addChild(background)
-
-    overBackground = new createjs.Shape()
-    overBackground.graphics.beginFill("888").drawCircle(10, 10, 10)
-
-    outline = new createjs.Shape()
-    outline.graphics.beginStroke("333").drawCircle(10, 10, 10)
-    @addChild(outline)
-
-    label = new createjs.Text(text, "20px Arial bold")
-    label.x = 3
-    label.y = -1
-    @addChild(label)
-
-    @addEventListener "click", trigger
-    @addEventListener "mouseover", =>
-      @removeChild(background)
-      @addChildAt(overBackground, 0)
-    @addEventListener "mouseout", =>
-      @removeChild(overBackground)
-      @addChildAt(background, 0)
-
+  addCamera: () ->
+    @cameraView.x = 20
+    @addChild(@cameraView)
 
 MageKnight.ControlPanelView = ControlPanelView

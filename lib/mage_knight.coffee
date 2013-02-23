@@ -2,13 +2,20 @@ Maps = new Lawnchair ->
 
 
 MageKnight =
+  newMap: ->
+    mesh = new MageKnight.TerrainMesh()
+    mesh.easyAddTile([], ["grass", "portal"])
+    @updateMesh(mesh)
   save: () ->
     throw "No map to save?" unless @terrainMesh?
     Maps.save(key: 'map', data: @terrainMesh.toObject())
   load: () ->
     Maps.get 'map', (map) =>
-      newMesh = MageKnight.TerrainMesh.fromObject(map.data)
-      @updateMesh(newMesh)
+      if map?
+        newMesh = MageKnight.TerrainMesh.fromObject(map.data)
+        @updateMesh(newMesh)
+      else
+        @newMap()
 
   getStage: ->
     @stage ?= do ->
@@ -31,8 +38,12 @@ MageKnight =
 
   setMesh: (mesh) ->
     @terrainMesh = mesh
+    @terrainMesh.addObserver => @save()
     terrainMeshView = new MageKnight.TerrainMeshView(mesh)
-    controlPanel = new MageKnight.ControlPanelView(terrainMeshView)
+    camera = new MageKnight.Camera(terrainMeshView)
+    cameraView = new MageKnight.CameraView(camera)
+    newMeshButton = new MageKnight.Button("New", => @newMap() if confirm("Are you sure?"))
+    controlPanel = new MageKnight.ControlPanelView(cameraView, newMeshButton)
     
     @getStage().addChild(terrainMeshView, controlPanel)
 
