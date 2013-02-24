@@ -1,17 +1,55 @@
 class TerrainMesh
-  constructor: ->
+  constructor: (opts={}) ->
     @tiles = {}
+    @groupTiles = []
     @observers = []
+    @tileStack = opts['tileStack']
+    @initializeTileStack() unless @tileStack?
+
+  initializeTileStack: ->
+    promptUntilValid = (text, maxAnswer) ->
+      answer = null
+      text = text + " [1..#{maxAnswer}]"
+      until answer?
+        # brutish, hamfisted approach: prompt and parse!
+        attempt = prompt(text)
+        parsedAttempt = parseInt(attempt)
+
+        # input validation...
+        if _.isNaN parsedAttempt
+          text = "Fail: #{attempt} could not be parsed as a number.\n" + text
+        else if parsedAttempt <= 0
+          text = "Fail: #{parsedAttempt} must be greater than zero.\n" + text
+        # ...and bounding
+        else if parsedAttempt > maxAnswer
+          answer = maxAnswer
+        else
+          answer = parsedAttempt
+
+      answer
+
+    grasslands = promptUntilValid("How many Grassland tiles?", _.size(MageKnight.TileSet.Grassland))
+    nonCity = promptUntilValid("How many Non-City Core tiles?", _.size(MageKnight.TileSet.Core.NonCity))
+    city = promptUntilValid("How many City Core tiles?", _.size(MageKnight.TileSet.Core.City))
+
+    @tileStack =
+      MageKnight.TileSet.shuffle(
+        grasslands: grasslands,
+        coreNonCity: nonCity,
+        coreCity: city)
 
   toObject: ->
     tileObjects = (tile.toObject() for index, tile of @tiles)
     return tiles: tileObjects
 
-  revealedTiles: () -> tile for location, tile of @tiles
+  getTileCount: -> (_ @tiles).size()
+  revealedTiles: -> tile for location, tile of @tiles
+  revealedGroupTiles: -> @groupTiles
 
   revealableLocations: () ->
     # turn tiles into their adjacencies
-    adjacencies = @revealedTiles().map (tile) -> tile.position.getAdjacencies()
+    adjacencies = (_ @revealedGroupTiles()).map (tile) ->
+      tile.getGroupAdjacencies()
     # concatenate them all together
     adjacencies = adjacencies.reduce (acc, adjs) ->
       acc.concat(adjs)
@@ -43,27 +81,52 @@ class TerrainMesh
   easyAddTile: (hexordinateLiteral, tileProperties=["grass"]) ->
     hexordinate = new MageKnight.HexCoordinate(hexordinateLiteral)
     tile = MageKnight.Tile.fromArray(tileProperties)
-    @addTile(hexordinate, tile)
-
-  addTile: (hexordinate, tile) ->
-    return @addFirstTile(tile) if not @getOriginTile() and hexordinate.isOrigin()
-
     tile.position = hexordinate
-    tile.mesh = this
+    @addTile(tile)
 
+  addTile: (tile) ->
+    throw "Tile has no position!" unless tile.position?
+    return @addFirstTile(tile) if tile.position.isOrigin()
+
+    hexordinate = tile.position
     # check coordinate for vacancy or throw
     throw "Already a tile at #{hexordinate}" if @tiles[hexordinate.array]?
     # detect all neighbor coordinates, throw if there are none
-    neighbors = []
-    for neighborHex in hexordinate.getAdjacencies()
-      do (neighborHex) ->
-        neighbors.push neighborHex.array 
-
+    neighbors = (neighborHex.array for neighborHex in hexordinate.getAdjacencies())
     neighbors = neighbors.filter (neighbor) => @tiles[neighbor]?
     throw new Error("Failure adding a tile at #{hexordinate}: no neighbors") if neighbors.length is 0
 
+    tile.mesh = this
     @tiles[hexordinate.array] = tile
     @notifyObservers()
+
+  addTileGroup: (centerHexordinate, tileGroup) ->
+    (_ tileGroup).each (tile) -> tile.position = centerHexordinate.add(tile.position)
+
+    tryAdding = (group) =>
+      retries = []
+      (_ group).each (tile) =>
+        try
+          @addTile(tile)
+        catch e
+          retries.push(tile)
+          # throw e
+
+      if retries.length is group.length
+        console.log retries
+        throw "Can't add these tiles"
+      else if retries.length > 0
+        tryAdding(retries)
+      else
+        @groupTiles.push centerHexordinate
+
+    tryAdding(tileGroup)
+
+  addNextTileGroupAt: (centerHexordinate) ->
+    @addTileGroup(centerHexordinate, @nextTileGroup())
+
+  nextTileGroup: ->
+    @tileStack.pop()
 
   addObserver: (observer) ->
     @observers.push observer
@@ -76,21 +139,11 @@ class TerrainMesh
     observer.notify?() or observer()
 
 TerrainMesh.fromObject = (object) ->
-  mesh = new TerrainMesh()
+  tiles = (MageKnight.Tile.fromObject(tileObject) for tileObject in object.tiles)
+  tileStack = []
 
-  tileObjects = (_ object.tiles).sortBy (tile) -> tile.position.length
-  tiles = (MageKnight.Tile.fromObject(tileObject) for tileObject in tileObjects)
-  tiles = (_ tiles).sortBy (tile) -> tile.position.array.length
-
-  firstTile = tiles.shift()
-  throw "Why isn't the first tile an origin tile?" unless firstTile.position.isOrigin()
-
-  mesh.addFirstTile(firstTile)
-
-  for tile in tiles
-    do (tile) ->    
-      mesh.addTile(tile.position, tile)
-
+  mesh = new TerrainMesh(tileStack: tileStack)
+  mesh.addTileGroup new MageKnight.HexCoordinate([]), tiles
   mesh
 
 MageKnight.TerrainMesh = TerrainMesh
