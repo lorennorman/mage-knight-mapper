@@ -1,8 +1,10 @@
 class MageKnight.TerrainMeshView extends createjs.Container
   constructor: (@model) ->
     super()
-    @x = @y = 200
-    @scaleX = @scaleY = .5
+    @x = 50
+    @y = 400
+    @scaleX = .275
+    @scaleY = .26
 
     @tileViewFactory = new MageKnight.TileViewCache()
 
@@ -26,7 +28,6 @@ class MageKnight.TerrainMeshView extends createjs.Container
     for location in @model.revealableLocations()
       do (location) =>
         hintView = MageKnight.HintView.fromHexordinate(location)
-        hintView.onClick = =>
-          @model.addTile(location, MageKnight.Tile.generateRandom())
+        hintView.onClick = => @model.addNextTileGroupAt(location)
 
         @addChild(hintView)
