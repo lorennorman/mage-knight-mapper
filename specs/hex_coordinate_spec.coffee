@@ -7,6 +7,16 @@ describe 'HexCoordinates', ->
     (expect hc).to.eql hex([1, 1])
     (expect hc).not.to.eql hex([2, 2])
 
+  it "can add other coordinates", ->
+    hc1 = hex [1, 1]
+    hc2 = hex [4, 4]
+    hc3 = hc1.add(hc2)
+    (expect hc3.array).to.eql []
+
+    hc4 = hex [1, 1]
+    hc5 = hc4.add(hc4)
+    (expect hc5.array).to.eql [1, 1, 1, 1]
+
   describe "inefficient path validation", ->
     it "throws for invalid elements", ->
       (expect -> hex([0, 1, 6]) ).to.throwException (e) ->

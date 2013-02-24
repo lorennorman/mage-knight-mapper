@@ -3,7 +3,7 @@ describe 'Tile', ->
     it "serializes to its coordinates, terrain, and feature", ->
       terrain = "grass"
       feature = "keep"
-      tile = new MageKnight.Tile(terrain, feature)
+      tile = new MageKnight.Tile(terrain: terrain, feature: feature)
       tile.position = new MageKnight.HexCoordinate([1, 1, 2, 2])
 
       tileObject = tile.toObject()
@@ -36,19 +36,19 @@ describe 'Tile', ->
     (expect tile.terrain).to.be("hill")
 
   it 'wraps around at the end of the terrain list', ->
-    tile = new MageKnight.Tile("water")
+    tile = new MageKnight.Tile(terrain: "water")
     tile.cycleTerrain()
     (expect tile.terrain).to.be("grass")
 
   it 'can cycle through features', ->
-    tile = new MageKnight.Tile("grass")
+    tile = new MageKnight.Tile(terrain: "grass")
     tile.cycleFeature()
     (expect tile.feature).to.be("village")
     tile.cycleFeature()
     (expect tile.feature).to.be("glade")
 
   it 'wraps at the end of the list', ->
-    tile = new MageKnight.Tile("grass", "city")
+    tile = new MageKnight.Tile(terrain: "grass", feature: "citywhite")
     tile.cycleFeature()
     (expect tile.feature).to.be(null)
     
