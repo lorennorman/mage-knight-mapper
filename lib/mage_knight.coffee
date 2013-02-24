@@ -1,19 +1,24 @@
 Maps = new Lawnchair ->
 
-
 MageKnight =
   newMap: ->
     mesh = new MageKnight.TerrainMesh()
-    mesh.easyAddTile([], ["grass", "portal"])
+    mesh.addTileGroup new MageKnight.HexCoordinate([]), MageKnight.TileSet.getStartGroup()
     @updateMesh(mesh)
+
   save: () ->
     throw "No map to save?" unless @terrainMesh?
     Maps.save(key: 'map', data: @terrainMesh.toObject())
+
   load: () ->
     Maps.get 'map', (map) =>
       if map?
-        newMesh = MageKnight.TerrainMesh.fromObject(map.data)
-        @updateMesh(newMesh)
+        try
+          newMesh = MageKnight.TerrainMesh.fromObject(map.data)
+          @updateMesh(newMesh)
+        catch e
+          console.log "failed to load the map, starting a new one"
+          @newMap()
       else
         @newMap()
 
