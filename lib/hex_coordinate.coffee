@@ -7,6 +7,10 @@ class HexCoordinate
   isOrigin: ->
     @array.length is 0
 
+  add: (hexordinate) ->
+    ary = @array.concat hexordinate.array
+    new HexCoordinate(ary)
+
   toString: ->
     "Hexordinate[#{@array.join()}]"
 
