@@ -23,6 +23,16 @@ class HexCoordinate
       new HexCoordinate(@array.concat(4)),
       new HexCoordinate(@array.concat(5))
     ]
+
+  getGroupAdjacencies: () ->
+    [
+      new HexCoordinate(@array.concat([0, 0, 1])),
+      new HexCoordinate(@array.concat([1, 1, 2])),
+      new HexCoordinate(@array.concat([2, 2, 3])),
+      new HexCoordinate(@array.concat([3, 3, 4])),
+      new HexCoordinate(@array.concat([4, 4, 5])),
+      new HexCoordinate(@array.concat([5, 5, 0]))
+    ]
     
 HexCoordinate.validate = (array) ->
   array = array.array or array
