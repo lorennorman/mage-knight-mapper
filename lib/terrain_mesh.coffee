@@ -60,7 +60,7 @@ class TerrainMesh
     tile.position = hexordinate
     @addTile(tile)
 
-  addTile: (tile) ->
+  addTile: (tile, opts={}) ->
     throw "Tile has no position!" unless tile.position?
     return @addFirstTile(tile) if tile.position.isOrigin()
 
@@ -74,16 +74,19 @@ class TerrainMesh
 
     tile.mesh = this
     @tiles[hexordinate.array] = tile
-    @notifyObservers()
+
+    unless opts['notify'] == false
+      @notifyObservers()
 
   addTileGroup: (centerHexordinate, tileGroup) ->
-    (_ tileGroup).each (tile) -> tile.position = centerHexordinate.add(tile.position)
+    (_ tileGroup).each (tile) ->
+      tile.position = centerHexordinate.add(tile.position)
 
     tryAdding = (group) =>
       retries = []
       (_ group).each (tile) =>
         try
-          @addTile(tile)
+          @addTile(tile, notify: false)
         catch e
           retries.push(tile)
           # throw e
