@@ -2,7 +2,8 @@ Maps = new Lawnchair ->
 
 MageKnight =
   newMap: ->
-    mesh = new MageKnight.TerrainMesh()
+    tileStack = MageKnight.Util.promptForTileStack()
+    mesh = new MageKnight.TerrainMesh(tileStack: tileStack)
     mesh.addTileGroup new MageKnight.HexCoordinate([]), MageKnight.TileSet.getStartGroup()
     @updateMesh(mesh)
 

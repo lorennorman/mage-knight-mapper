@@ -19,8 +19,7 @@ describe 'HexCoordinates', ->
 
   describe "inefficient path validation", ->
     it "throws for invalid elements", ->
-      (expect -> hex([0, 1, 6]) ).to.throwException (e) ->
-        expect(e).to.be.a(MageKnight.HexCoordinate.ValidationError)
+      (expect -> hex([0, 1, 6]) ).to.throwException
 
     it "sorts the path", ->
       hc = hex([1, 2, 1, 2])

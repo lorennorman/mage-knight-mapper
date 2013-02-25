@@ -1,5 +1,5 @@
 simpleMesh = ->
-  new MageKnight.TerrainMesh tileStack: []
+  new MageKnight.TerrainMesh
 
 describe 'TerrainMesh', ->
   describe 'serialization', ->

@@ -39,8 +39,9 @@ HexCoordinate.validate = (array) ->
   coordinates = [0..5]
 
   isValidCoordinate = (el) ->
-    coordinates.indexOf(el) > -1
-  throw new ValidationError("Invalid index") unless array.every(isValidCoordinate) #isValid(array)?
+    throw "Invalid index: #{el}" unless coordinates.indexOf(el) > -1
+
+  array.every(isValidCoordinate)
 
   # [ [0, 0], [1, 1, 1], [2], [3, 3], ...]
   groups = coordinates.map (coordinate) ->
