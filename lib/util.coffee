@@ -21,11 +21,11 @@ MageKnight.Util =
     answer
 
   promptForTileStack: ->
-    grasslands = @promptUntilValid("How many Grassland tiles?", _.size(MageKnight.TileSet.Grassland))
-    nonCity = @promptUntilValid("How many Non-City Core tiles?", _.size(MageKnight.TileSet.Core.NonCity))
-    city = @promptUntilValid("How many City Core tiles?", _.size(MageKnight.TileSet.Core.City))
+    grasslands = @promptUntilValid("How many Grassland tiles?", _.size(MageKnight.TileStack.Grassland))
+    nonCity = @promptUntilValid("How many Non-City Core tiles?", _.size(MageKnight.TileStack.Core.NonCity))
+    city = @promptUntilValid("How many City Core tiles?", _.size(MageKnight.TileStack.Core.City))
 
-    MageKnight.TileSet.shuffle(
+    MageKnight.TileStack.shuffle(
       grasslands: grasslands,
       coreNonCity: nonCity,
       coreCity: city)

@@ -4,7 +4,7 @@ MageKnight =
   newMap: ->
     tileStack = MageKnight.Util.promptForTileStack()
     mesh = new MageKnight.TerrainMesh(tileStack: tileStack)
-    mesh.addTileGroup new MageKnight.HexCoordinate([]), MageKnight.TileSet.getStartGroup()
+    mesh.addTileGroup new MageKnight.HexCoordinate([]), MageKnight.TileStack.getStartGroup()
     @updateMesh(mesh)
 
   save: () ->

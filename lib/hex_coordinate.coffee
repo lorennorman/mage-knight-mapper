@@ -4,15 +4,12 @@ class HexCoordinate
   constructor: (array) ->
     @array = HexCoordinate.validate(array)
 
-  isOrigin: ->
-    @array.length is 0
+  toString: -> "Hexordinate[#{@array.join()}]"
+  isOrigin: -> @array.length is 0
 
   add: (hexordinate) ->
     ary = @array.concat hexordinate.array
     new HexCoordinate(ary)
-
-  toString: ->
-    "Hexordinate[#{@array.join()}]"
 
   getAdjacencies: () ->
     [

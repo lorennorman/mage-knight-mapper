@@ -3,11 +3,13 @@ class TerrainMesh
     @tiles = {}
     @groupTiles = []
     @observers = []
-    @tileStack = opts['tileStack'] or []
+    @tileStack = opts['tileStack'] or new MageKnight.TileStack
 
   toObject: ->
     tileObjects = (tile.toObject() for index, tile of @tiles)
-    return tiles: tileObjects
+    tileStackObject = @tileStack.toObject()
+
+    return tiles: tileObjects, tileStack: tileStackObject
 
   getTileCount: -> (_ @tiles).size()
   revealedTiles: -> tile for location, tile of @tiles
@@ -107,7 +109,7 @@ class TerrainMesh
 
 TerrainMesh.fromObject = (object) ->
   tiles = (MageKnight.Tile.fromObject(tileObject) for tileObject in object.tiles)
-  tileStack = []
+  tileStack = MageKnight.TileStack.fromObject(object.tileStack)
 
   mesh = new TerrainMesh(tileStack: tileStack)
   mesh.addTileGroup new MageKnight.HexCoordinate([]), tiles

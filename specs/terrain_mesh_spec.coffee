@@ -30,12 +30,17 @@ describe 'TerrainMesh', ->
           terrain: "desert"
           position: [0]
         ]
+        tileStack: [
+          [
+            { position: [], terrain: 'forest', feature: 'keep' }
+          ]
+        ]
 
       mesh = MageKnight.TerrainMesh.fromObject(terrainMeshObject)
 
-      console.log mesh.tiles
       (expect mesh.getOriginTile().feature).to.be "keep"
       (expect mesh.getTileAt([0]).terrain).to.be "desert"
+      (expect mesh.tileStack.next()[0].terrain).to.be "forest"
 
   it 'recalls its first tile', ->
     tile =

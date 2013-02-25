@@ -98,8 +98,16 @@ Tile.fromObject = (tileObject) ->
   new Tile(tileObject)
 
 
-TileSet = {}
-TileSet.Special =
+class TileStack
+  constructor: (@tileGroups=[]) ->
+
+  next: ->
+    MageKnight.Tile.fromObject(tileObject) for tileObject in @tileGroups.pop()
+
+  toObject: ->
+    @tileGroups
+
+TileStack.Special =
   portalA: 
     [
       { position: [ ], terrain: 'grass', feature: 'portal' }
@@ -131,8 +139,8 @@ TileSet.Special =
       { position: [5], terrain: 'forest', feature: 'orcs' }
     ]
 
-TileSet.Grassland = {}
-TileSet.Grassland[1] = 
+TileStack.Grassland = {}
+TileStack.Grassland[1] = 
   [
     { position: [ ], terrain: 'forest', feature: 'glade' }
     { position: [0], terrain: 'water' }
@@ -142,7 +150,7 @@ TileSet.Grassland[1] =
     { position: [4], terrain: 'forest' }
     { position: [5], terrain: 'forest', feature: 'orcs' }
   ]
-TileSet.Grassland[2] = 
+TileStack.Grassland[2] = 
   [
     { position: [ ], terrain: 'hill' }
     { position: [0], terrain: 'forest', feature: 'glade' }
@@ -152,7 +160,7 @@ TileSet.Grassland[2] =
     { position: [4], terrain: 'grass' }
     { position: [5], terrain: 'hill', feature: 'orcs' }
   ]
-TileSet.Grassland[3] = 
+TileStack.Grassland[3] = 
   [
     { position: [ ], terrain: 'forest' }
     { position: [0], terrain: 'hill', feature: 'keep' }
@@ -162,7 +170,7 @@ TileSet.Grassland[3] =
     { position: [4], terrain: 'grass' }
     { position: [5], terrain: 'grass' }
   ]
-TileSet.Grassland[4] = 
+TileStack.Grassland[4] = 
   [
     { position: [ ], terrain: 'desert', feature: 'magetower' }
     { position: [0], terrain: 'desert' }
@@ -172,7 +180,7 @@ TileSet.Grassland[4] =
     { position: [4], terrain: 'hill', feature: 'orcs' }
     { position: [5], terrain: 'desert' }
   ]
-TileSet.Grassland[5] = 
+TileStack.Grassland[5] = 
   [
     { position: [ ], terrain: 'water' }
     { position: [0], terrain: 'grass', feature: 'monastery' }
@@ -182,7 +190,7 @@ TileSet.Grassland[5] =
     { position: [4], terrain: 'forest', feature: 'glade' }
     { position: [5], terrain: 'forest' }
   ]
-TileSet.Grassland[6] = 
+TileStack.Grassland[6] = 
   [
     { position: [ ], terrain: 'hill', feature: 'minered' }
     { position: [0], terrain: 'forest' }
@@ -192,7 +200,7 @@ TileSet.Grassland[6] =
     { position: [4], terrain: 'hill', feature: 'monsterden' }
     { position: [5], terrain: 'mountain' }
   ]
-TileSet.Grassland[7] = 
+TileStack.Grassland[7] = 
   [
     { position: [ ], terrain: 'swamp' }
     { position: [0], terrain: 'forest', feature: 'orcs' }
@@ -202,7 +210,7 @@ TileSet.Grassland[7] =
     { position: [4], terrain: 'grass', feature: 'monastery' }
     { position: [5], terrain: 'water' }
   ]
-TileSet.Grassland[8] = 
+TileStack.Grassland[8] = 
   [
     { position: [ ], terrain: 'swamp', feature: 'orcs' }
     { position: [0], terrain: 'forest', feature: 'ruins' }
@@ -212,7 +220,7 @@ TileSet.Grassland[8] =
     { position: [4], terrain: 'forest' }
     { position: [5], terrain: 'forest', feature: 'glade' }
   ]
-TileSet.Grassland[9] = 
+TileStack.Grassland[9] = 
   [
     { position: [ ], terrain: 'mountain' }
     { position: [0], terrain: 'mountain' }
@@ -222,7 +230,7 @@ TileSet.Grassland[9] =
     { position: [4], terrain: 'grass' }
     { position: [5], terrain: 'wasteland', feature: 'dungeon' }
   ]
-TileSet.Grassland[10] = 
+TileStack.Grassland[10] = 
   [
     { position: [ ], terrain: 'mountain' }
     { position: [0], terrain: 'forest' }
@@ -232,7 +240,7 @@ TileSet.Grassland[10] =
     { position: [4], terrain: 'hill' }
     { position: [5], terrain: 'hill', feature: 'monsterden' }
   ]
-TileSet.Grassland[11] = 
+TileStack.Grassland[11] = 
   [
     { position: [ ], terrain: 'grass', feature: 'magetower' }
     { position: [0], terrain: 'water' }
@@ -242,7 +250,7 @@ TileSet.Grassland[11] =
     { position: [4], terrain: 'grass', feature: 'ruins' }
     { position: [5], terrain: 'hill' }
   ]
-TileSet.Grassland[12] = 
+TileStack.Grassland[12] = 
   [
     { position: [ ], terrain: 'grass', feature: 'orcs' }
     { position: [0], terrain: 'swamp' }
@@ -252,7 +260,7 @@ TileSet.Grassland[12] =
     { position: [4], terrain: 'hill', feature: 'refugeecamp' }
     { position: [5], terrain: 'mountain' }
   ]
-TileSet.Grassland[13] = 
+TileStack.Grassland[13] = 
   [
     { position: [ ], terrain: 'forest', feature: 'magetower' }
     { position: [0], terrain: 'hill', feature: 'orcs' }
@@ -262,7 +270,7 @@ TileSet.Grassland[13] =
     { position: [4], terrain: 'swamp', feature: 'glade' }
     { position: [5], terrain: 'forest' }
   ]
-TileSet.Grassland[14] = 
+TileStack.Grassland[14] = 
   [
     { position: [ ], terrain: 'grass' }
     { position: [0], terrain: 'grass', feature: 'keep' }
@@ -273,10 +281,10 @@ TileSet.Grassland[14] =
     { position: [5], terrain: 'desert' }
   ]
 
-TileSet.Core = {}
-TileSet.Core.City = {}
-TileSet.Core.NonCity = {}
-TileSet.Core.NonCity[1] = 
+TileStack.Core = {}
+TileStack.Core.City = {}
+TileStack.Core.NonCity = {}
+TileStack.Core.NonCity[1] = 
   [
     { position: [ ], terrain: 'desert', feature: 'monastery' }
     { position: [0], terrain: 'desert', feature: 'tomb' }
@@ -286,7 +294,7 @@ TileSet.Core.NonCity[1] =
     { position: [4], terrain: 'hill', feature: 'spawninggrounds' }
     { position: [5], terrain: 'mountain' }
   ]
-TileSet.Core.NonCity[2] = 
+TileStack.Core.NonCity[2] = 
   [
     { position: [ ], terrain: 'water' }
     { position: [0], terrain: 'swamp', feature: 'ruins' }
@@ -296,7 +304,7 @@ TileSet.Core.NonCity[2] =
     { position: [4], terrain: 'forest' }
     { position: [5], terrain: 'water' }
   ]
-TileSet.Core.NonCity[3] = 
+TileStack.Core.NonCity[3] = 
   [
     { position: [ ], terrain: 'wasteland' }
     { position: [0], terrain: 'wasteland', feature: 'ruins' }
@@ -306,7 +314,7 @@ TileSet.Core.NonCity[3] =
     { position: [4], terrain: 'wasteland', feature: 'tomb' }
     { position: [5], terrain: 'mountain' }
   ]
-TileSet.Core.NonCity[4] = 
+TileStack.Core.NonCity[4] = 
   [
     { position: [ ], terrain: 'mountain', feature: 'draconum' }
     { position: [0], terrain: 'hill' }
@@ -316,7 +324,7 @@ TileSet.Core.NonCity[4] =
     { position: [4], terrain: 'wasteland' }
     { position: [5], terrain: 'hill', feature: 'mineblue' }
   ]
-TileSet.Core.City[5] = 
+TileStack.Core.City[5] = 
   [
     { position: [ ], terrain: 'grass', feature: 'citygreen' }
     { position: [0], terrain: 'swamp', feature: 'village' }
@@ -326,7 +334,7 @@ TileSet.Core.City[5] =
     { position: [4], terrain: 'water' }
     { position: [5], terrain: 'forest', feature: 'glade' }
   ]
-TileSet.Core.City[6] = 
+TileStack.Core.City[6] = 
   [
     { position: [ ], terrain: 'grass', feature: 'cityblue' }
     { position: [0], terrain: 'grass', feature: 'monastery' }
@@ -336,7 +344,7 @@ TileSet.Core.City[6] =
     { position: [4], terrain: 'mountain', feature: 'draconum' }
     { position: [5], terrain: 'forest' }
   ]
-TileSet.Core.City[7] = 
+TileStack.Core.City[7] = 
   [
     { position: [ ], terrain: 'grass', feature: 'citywhite' }
     { position: [0], terrain: 'grass' }
@@ -346,7 +354,7 @@ TileSet.Core.City[7] =
     { position: [4], terrain: 'wasteland', feature: 'keep' }
     { position: [5], terrain: 'wasteland', feature: 'spawninggrounds' }
   ]
-TileSet.Core.City[8] = 
+TileStack.Core.City[8] = 
   [
     { position: [ ], terrain: 'grass', feature: 'cityred' }
     { position: [0], terrain: 'hill', feature: 'minered' }
@@ -356,7 +364,7 @@ TileSet.Core.City[8] =
     { position: [4], terrain: 'wasteland', feature: 'draconum' }
     { position: [5], terrain: 'desert', feature: 'ruins' }
   ]
-TileSet.Core.NonCity[9] = 
+TileStack.Core.NonCity[9] = 
   [
     { position: [ ], terrain: 'grass', feature: 'draconum' }
     { position: [0], terrain: 'hill', feature: 'magetower' }
@@ -366,7 +374,7 @@ TileSet.Core.NonCity[9] =
     { position: [4], terrain: 'wasteland' }
     { position: [5], terrain: 'hill', feature: 'labyrinth' }
   ]
-TileSet.Core.NonCity[10] = 
+TileStack.Core.NonCity[10] = 
   [
     { position: [ ], terrain: 'swamp' }
     { position: [0], terrain: 'water' }
@@ -377,10 +385,13 @@ TileSet.Core.NonCity[10] =
     { position: [5], terrain: 'swamp', feature: 'deepmineredwhitebluegreen' }
   ]
 
-TileSet.getStartGroup = ->
-  new MageKnight.Tile.fromObject(tileObject) for tileObject in TileSet.Special["portalA"]
+TileStack.fromObject = (tileStackObject) ->
+  new TileStack(tileStackObject)
 
-TileSet.shuffle = (opts={}) ->
+TileStack.getStartGroup = ->
+  new MageKnight.Tile.fromObject(tileObject) for tileObject in TileStack.Special["portalA"]
+
+TileStack.shuffle = (opts={}) ->
   prepareDeck = (sourceDeck, numberOfTiles) ->
     if numberOfTiles is 0
       prepDeck = []
@@ -392,21 +403,18 @@ TileSet.shuffle = (opts={}) ->
     prepDeck
 
   # shuffle each deck, truncate according to options
-  grasslands = prepareDeck(TileSet.Grassland, opts['grasslands'])
-  noncity = prepareDeck(TileSet.Core.NonCity, opts['coreNonCity'])
-  city = prepareDeck(TileSet.Core.City, opts['coreCity'])
+  grasslands = prepareDeck(TileStack.Grassland, opts['grasslands'])
+  noncity = prepareDeck(TileStack.Core.NonCity, opts['coreNonCity'])
+  city = prepareDeck(TileStack.Core.City, opts['coreCity'])
 
   # shuffle city and non-city core tiles together
   core = _.shuffle noncity.concat(city)
 
   # place core tiles under grassland tiles, return this final stack
   finalStack = core.concat(grasslands)
-  finalStack.next = ->
-    new MageKnight.Tile.fromObject(tileObject) for tileObject in @pop()
+  TileStack.fromObject finalStack
 
-  finalStack
-
-MageKnight.TileSet = TileSet
+MageKnight.TileStack = TileStack
 MageKnight.Tile = Tile
 MageKnight.Terrain = Terrain
 MageKnight.Feature = Feature
