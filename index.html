@@ -10,19 +10,13 @@
 <script src='public/jquery.js'></script>
 <script src='public/underscore.js'></script>
 <script src='public/create.js'></script>
+<script src='public/lawnchair.js'></script>
 <script src='public/build/mage_knight.js'></script>
 
 <script>
   $(function() {
     MageKnight.Loader.filePath = "public/"
-
-    MageKnight.startWithMegaTile([
-       [ [ "grass", "village" ], [ "forest", "glade" ] ],
-      [ [ "hill" ], [ "grass", "portal" ], [ "grass" ] ],
-                [ [ "water" ], [ "water" ] ]
-    ]);
-
-
+    MageKnight.load();
   });
 </script>
 
