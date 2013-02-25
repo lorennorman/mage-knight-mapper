@@ -125,7 +125,8 @@ HintView =
   fromHexordinate: (hexordinate) ->
     hintView = new createjs.Shape()
     centerPoint = [TileView.width/2, TileView.height/2]
-    hintView.graphics.beginFill("#FFF").drawCircle(0, 0, 60)
+    hintView.graphics.beginFill("#EEF5EE").drawCircle(0, 0, 220)
+    hintView.alpha = .5
     [hintView.x, hintView.y] = TileView.transformByParity(centerPoint, hexordinate)
     
     hintOver = new createjs.Shape()

@@ -13,20 +13,27 @@ class TerrainMesh
 
   getTileCount: -> (_ @tiles).size()
   revealedTiles: -> tile for location, tile of @tiles
-  revealedGroupTiles: -> @groupTiles
 
   revealableLocations: () ->
-    # turn tiles into their adjacencies
-    adjacencies = (_ @revealedGroupTiles()).map (tile) ->
-      tile.getGroupAdjacencies()
-    # concatenate them all together
-    adjacencies = adjacencies.reduce (acc, adjs) ->
-      acc.concat(adjs)
-    , []
-    # drop all the locations where a tile already is
-    adjacencies = adjacencies.filter (adj) => not @tiles[adj.array]?
-    # de-dupe this array
-    # TODO
+    checked = {}
+    answers = []
+
+    checkAdjacencies = (location) =>
+      # remember what we've checked...
+      checked[location.array] = true
+
+      (_ location.getGroupAdjacencies()).each (nearbyLocation) =>
+        # ...sidestep infinite recursion
+        return if checked[nearbyLocation.array]?
+
+        if @tiles[nearbyLocation.array]?
+          checkAdjacencies(nearbyLocation) # recurse!
+        else
+          answers.push nearbyLocation
+
+    checkAdjacencies(new MageKnight.HexCoordinate([]))
+
+    answers
 
   addFirstTile: (tile) ->
     if @_originTile?
@@ -88,6 +95,7 @@ class TerrainMesh
         tryAdding(retries)
       else
         @groupTiles.push centerHexordinate
+        @notifyObservers()
 
     tryAdding(tileGroup)
 

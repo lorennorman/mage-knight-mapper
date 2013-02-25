@@ -12,8 +12,8 @@ class MageKnight.TerrainMeshView extends createjs.Container
 
   updateDisplayList: () =>
     @clearViews()
-    @addTileViews()
     @addHintViews()
+    @addTileViews()
 
   clearViews: ->
     @removeAllChildren()
@@ -28,6 +28,7 @@ class MageKnight.TerrainMeshView extends createjs.Container
     for location in @model.revealableLocations()
       do (location) =>
         hintView = MageKnight.HintView.fromHexordinate(location)
-        hintView.onClick = => @model.addNextTileGroupAt(location)
+        hintView.onClick = =>
+          @model.addNextTileGroupAt(location) if confirm("Reveal Tile?")
 
         @addChild(hintView)
