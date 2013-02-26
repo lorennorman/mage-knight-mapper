@@ -46,6 +46,7 @@ TileView =
     cityblue: "city_blue"
     citygreen: "city_green"
     citywhite: "city_white"
+    refugeecamp: "camp"
 
   getTerrainView: (terrain) ->
     if @terrainFileMap[terrain]?
