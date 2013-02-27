@@ -1,20 +1,3 @@
-Terrain =
-  types: [
-    "grass", "forest", "hill", "mountain",
-    "desert", "swamp", "wasteland", "water"
-  ]
-
-  next: (type) ->
-    nextIndex = @types.indexOf(type)+1
-    nextIndex = nextIndex % @types.length
-    @types[nextIndex]
-
-  find: (name) ->
-    name
-
-  random: () ->
-    @types[Math.floor(Math.random()*@types.length)]
-
 Feature =
   types: [
     null, "village", "glade", "monastery",
@@ -38,7 +21,16 @@ Feature =
 
 class Tile
   constructor: (opts={}) ->
-    @terrain = opts['terrain'] or Terrain.find("grass")
+    @terrain = do ->
+      terrain = opts['terrain']
+      if terrain?
+        if _.isString(terrain)
+          MageKnight.Terrain.find(terrain) 
+        else
+          terrain
+      else
+        MageKnight.Terrain.find("grass")
+
     @feature = opts['feature'] or null
     @position = opts['position'] or new MageKnight.HexCoordinate([])
     @firstTile = false
@@ -52,14 +44,6 @@ class Tile
     terrain: @terrain
     feature: @feature
     position: @position.array
-
-  cycleTerrain: () ->
-    @terrain = Terrain.next(@terrain)
-    @notifyObservers()
-
-  cycleFeature: () ->
-    @feature = Feature.next(@feature)
-    @notifyObservers()
 
   neighborAt: (location) ->
     @getNeighbors()[location]
@@ -82,16 +66,13 @@ class Tile
 
 
 Tile.fromNames = (terrainName, featureName=null) ->
-  terrain = Terrain.find(terrainName)
+  terrain = MageKnight.Terrain.find(terrainName)
   feature = Feature.find(featureName)
 
   new Tile(terrain: terrain, feature: feature)
 
 Tile.fromArray = (orderedProperties) ->
   Tile.fromNames(orderedProperties[0], orderedProperties[1])
-
-Tile.generateRandom = () ->
-  new Tile terrain: Terrain.random()#, Feature.random()]
 
 Tile.fromObject = (tileObject) ->
   tileObject.position = new MageKnight.HexCoordinate(tileObject.position)
@@ -416,5 +397,4 @@ TileStack.shuffle = (opts={}) ->
 
 MageKnight.TileStack = TileStack
 MageKnight.Tile = Tile
-MageKnight.Terrain = Terrain
 MageKnight.Feature = Feature

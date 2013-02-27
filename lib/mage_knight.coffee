@@ -60,16 +60,4 @@ MageKnight =
 
       terrainMesh
 
-  startWithMegaTile: (tiles) ->
-    terrainMesh = @bootstrap()
-
-    middleTile = MageKnight.Tile.fromNames(tiles[1][1][0], tiles[1][1][1])
-    terrainMesh.addFirstTile(middleTile)
-    terrainMesh.easyAddTile([0], [tiles[0][1][0], tiles[0][1][1]])
-    terrainMesh.easyAddTile([1], [tiles[1][2][0], tiles[1][2][1]])
-    terrainMesh.easyAddTile([2], [tiles[2][1][0], tiles[2][1][1]])
-    terrainMesh.easyAddTile([3], [tiles[2][0][0], tiles[2][0][1]])
-    terrainMesh.easyAddTile([4], [tiles[1][0][0], tiles[1][0][1]])
-    terrainMesh.easyAddTile([5], [tiles[0][0][0], tiles[0][0][1]])
-
 window.MageKnight = MageKnight

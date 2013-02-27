@@ -49,14 +49,9 @@ TileView =
     refugeecamp: "camp"
 
   getTerrainView: (terrain) ->
-    if @terrainFileMap[terrain]?
-      terrainView = new createjs.Bitmap("#{Loader.filePath}terrain/#{@terrainFileMap[terrain]}.png")
-    else
-      console.log "missing #{terrain} file"
-      terrainView = new createjs.Shape()
-      terrainView.graphics.beginFill("red").drawCircle(0, 0, 90)
+    throw "No terrain file in dictionary for:" + terrain unless @terrainFileMap[terrain.type]?
 
-    terrainView
+    new createjs.Bitmap("#{Loader.filePath}terrain/#{@terrainFileMap[terrain.type]}.png")
 
   getFeatureView: (feature) ->
     if @featureFileMap[feature]?
@@ -67,6 +62,15 @@ TileView =
       terrainView.graphics.beginFill("red").drawCircle(0, 0, 90)
 
     featureView
+
+  getMoveScoreOverlay: (terrain) ->
+    unless terrain.impassable
+      moveScoreText = new createjs.Text(terrain.moveScore, "150px Arial") 
+      moveScoreText.alpha = .65
+      moveScoreText.x = 30
+      moveScoreText.y = 15
+
+    moveScoreText
 
   fromModel: (model) ->
     container = new createjs.Container()
@@ -79,6 +83,7 @@ TileView =
     container.updateByModel = (model) =>
       newTerrainView = @getTerrainView(model.terrain)
       newFeatureView = @getFeatureView(model.feature) if model.feature?
+      moveScoreOverlay = @getMoveScoreOverlay(model.terrain)
 
       container.removeChild(currentTerrainView) if currentTerrainView?
       container.addChild(newTerrainView)
@@ -87,6 +92,8 @@ TileView =
       container.removeChild(currentFeatureView) if currentFeatureView?
       container.addChild(newFeatureView)
       currentFeatureView = newFeatureView
+
+      container.addChild(moveScoreOverlay)
 
     model.addObserver => container.updateByModel(model)
 

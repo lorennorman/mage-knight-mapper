@@ -39,8 +39,8 @@ describe 'TerrainMesh', ->
       mesh = MageKnight.TerrainMesh.fromObject(terrainMeshObject)
 
       (expect mesh.getOriginTile().feature).to.be "keep"
-      (expect mesh.getTileAt([0]).terrain).to.be "desert"
-      (expect mesh.tileStack.next()[0].terrain).to.be "forest"
+      (expect mesh.getTileAt([0]).terrain.type).to.be "desert"
+      (expect mesh.tileStack.next()[0].terrain.type).to.be "forest"
 
   it 'recalls its first tile', ->
     tile =
@@ -82,10 +82,10 @@ describe 'TerrainMesh', ->
 
     mesh = simpleMesh()
     mesh.addFirstTile({})
-    mesh.easyAddTile([1], {})
+    mesh.easyAddTile([1])
     mesh.easyAddTile([1, 1], tile)
     
-    (expect mesh.getTileAt([1, 1]).terrain).to.be "hill"
+    (expect mesh.getTileAt([1, 1]).terrain.type).to.be "hill"
 
   it 'gives access to tiles', ->
     mesh = simpleMesh()
