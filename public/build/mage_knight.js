@@ -72,7 +72,7 @@
       getRandomCloud = function() {
         var cloud, cloudFile, cloudNum, totalSpeed;
         cloudNum = Math.ceil(Math.random() * 6);
-        cloudFile = "clouds/cloud" + cloudNum + ".png";
+        cloudFile = "" + MageKnight.Loader.filePath + "clouds/cloud" + cloudNum + ".png";
         cloud = new createjs.Bitmap(cloudFile);
         cloud.x = Math.random() * 640 - 220;
         cloud.y = Math.random() * 480;
