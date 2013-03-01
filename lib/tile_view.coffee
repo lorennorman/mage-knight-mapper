@@ -36,7 +36,14 @@ TileView =
     cityblue: "city_blue"
     citygreen: "city_green"
     citywhite: "city_white"
+    # x-pack features
+    deepmineredwhite: "redwhitedeepmine"
+    deepminebluegreen: "greenbluedeepmine"
+    deepmineredwhitebluegreen: "4waydeepmine"
+    maze: "maze"
+    labyrinth: "labyrinth"
     refugeecamp: "camp"
+    volkarescamp: "generalcamp"
 
   getFeatureView: (feature) ->
     if @featureFileMap[feature]?
@@ -78,7 +85,7 @@ TileView =
       container.addChild(newFeatureView)
       currentFeatureView = newFeatureView
 
-      container.addChild(moveScoreOverlay)
+      # container.addChild(moveScoreOverlay)
 
     model.addObserver => container.updateByModel(model)
 

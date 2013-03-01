@@ -246,7 +246,7 @@ TileStack.Grassland[13] =
     { position: [ ], terrain: 'forest', feature: 'magetower' }
     { position: [0], terrain: 'hill', feature: 'orcs' }
     { position: [1], terrain: 'water' }
-    { position: [2], terrain: 'forest', feature: 'deepminegreenblue' }
+    { position: [2], terrain: 'forest', feature: 'deepminebluegreen' }
     { position: [3], terrain: 'grass' }
     { position: [4], terrain: 'swamp', feature: 'glade' }
     { position: [5], terrain: 'forest' }
@@ -345,6 +345,7 @@ TileStack.Core.City[8] =
     { position: [4], terrain: 'wasteland', feature: 'draconum' }
     { position: [5], terrain: 'desert', feature: 'ruins' }
   ]
+TileStack.Core.City['v'] = TileStack.Special['v']
 TileStack.Core.NonCity[9] = 
   [
     { position: [ ], terrain: 'grass', feature: 'draconum' }
