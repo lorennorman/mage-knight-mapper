@@ -56,7 +56,7 @@ AnimatedTerrainView =
         setTimeout ->
           animateCycle()
         , 10000
-      , 7200
+      , 2400
 
     animateCycle()
 
