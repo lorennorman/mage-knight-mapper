@@ -46,7 +46,7 @@
         stage = new createjs.Stage("demo");
         stage.enableMouseOver();
         createjs.Ticker.useRAF = true;
-        createjs.Ticker.setFPS(5);
+        createjs.Ticker.setFPS(15);
         createjs.Ticker.addEventListener("tick", function() {
           return stage.update();
         });
@@ -62,13 +62,57 @@
       return this.getStage().removeAllChildren();
     },
     setMesh: function(mesh) {
-      var camera, cameraView, controlPanel, newMeshButton, terrainMeshView,
+      var camera, cameraView, cloud, cloudTicker, clouds, controlPanel, getRandomCloud, i, newMeshButton, stage, terrainMeshView, _i, _len,
         _this = this;
       this.terrainMesh = mesh;
       this.terrainMesh.addObserver(function() {
         return _this.save();
       });
       terrainMeshView = new MageKnight.TerrainMeshView(mesh);
+      getRandomCloud = function() {
+        var cloud, cloudFile, cloudNum, totalSpeed;
+        cloudNum = Math.ceil(Math.random() * 6);
+        cloudFile = "clouds/cloud" + cloudNum + ".png";
+        cloud = new createjs.Bitmap(cloudFile);
+        cloud.x = Math.random() * 640 - 220;
+        cloud.y = Math.random() * 480;
+        cloud.scaleX = cloud.scaleY = .33 + Math.random() / 4;
+        cloud.alpha = .33 + Math.random() / 4;
+        cloud.rotation = 315;
+        totalSpeed = .75 + Math.random();
+        cloud._speedX = totalSpeed / 2;
+        cloud._speedY = -totalSpeed / 4;
+        return cloud;
+      };
+      clouds = (function() {
+        var _i, _results;
+        _results = [];
+        for (i = _i = 1; _i <= 10; i = ++_i) {
+          _results.push(getRandomCloud());
+        }
+        return _results;
+      })();
+      cloudTicker = function() {
+        var cloud, _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = clouds.length; _i < _len; _i++) {
+          cloud = clouds[_i];
+          _results.push((function(cloud) {
+            if (cloud.x > 860) {
+              cloud.x = -220;
+            }
+            if (cloud.y < -140) {
+              cloud.y = 620;
+            }
+            cloud.x += cloud._speedX;
+            return cloud.y += cloud._speedY;
+          })(cloud));
+        }
+        return _results;
+      };
+      setInterval(function() {
+        return cloudTicker();
+      }, 50);
       camera = new MageKnight.Camera(terrainMeshView);
       cameraView = new MageKnight.CameraView(camera);
       newMeshButton = new MageKnight.Button("New", function() {
@@ -77,7 +121,13 @@
         }
       });
       controlPanel = new MageKnight.ControlPanelView(cameraView, newMeshButton);
-      return this.getStage().addChild(terrainMeshView, controlPanel);
+      stage = this.getStage();
+      stage.addChild(terrainMeshView);
+      for (_i = 0, _len = clouds.length; _i < _len; _i++) {
+        cloud = clouds[_i];
+        stage.addChild(cloud);
+      }
+      return stage.addChild(controlPanel);
     },
     bootstrap: function() {
       var _ref,
@@ -88,18 +138,6 @@
         _this.setMesh(terrainMesh);
         return terrainMesh;
       })();
-    },
-    startWithMegaTile: function(tiles) {
-      var middleTile, terrainMesh;
-      terrainMesh = this.bootstrap();
-      middleTile = MageKnight.Tile.fromNames(tiles[1][1][0], tiles[1][1][1]);
-      terrainMesh.addFirstTile(middleTile);
-      terrainMesh.easyAddTile([0], [tiles[0][1][0], tiles[0][1][1]]);
-      terrainMesh.easyAddTile([1], [tiles[1][2][0], tiles[1][2][1]]);
-      terrainMesh.easyAddTile([2], [tiles[2][1][0], tiles[2][1][1]]);
-      terrainMesh.easyAddTile([3], [tiles[2][0][0], tiles[2][0][1]]);
-      terrainMesh.easyAddTile([4], [tiles[1][0][0], tiles[1][0][1]]);
-      return terrainMesh.easyAddTile([5], [tiles[0][0][0], tiles[0][0][1]]);
     }
   };
 
@@ -454,6 +492,84 @@
 }).call(this);
 
 (function() {
+  var Terrain, TerrainType, terrainObjectCache;
+
+  TerrainType = {
+    grass: {
+      type: "grass",
+      moveScore: 2
+    },
+    forest: {
+      type: "forest",
+      moveScore: 3,
+      moveScoreAtNight: 5
+    },
+    hill: {
+      type: "hill",
+      moveScore: 3
+    },
+    desert: {
+      type: "desert",
+      moveScore: 5,
+      moveScoreAtNight: 3
+    },
+    wasteland: {
+      type: "wasteland",
+      moveScore: 4
+    },
+    swamp: {
+      type: "swamp",
+      moveScore: 5
+    },
+    mountain: {
+      type: "mountain",
+      impassable: "true"
+    },
+    water: {
+      type: "water",
+      impassable: "true"
+    }
+  };
+
+  Terrain = (function() {
+
+    function Terrain(opts) {
+      if (opts == null) {
+        opts = {};
+      }
+      this.type = opts['type'] || (function() {
+        throw "Terrain requires a type";
+      })();
+      this.moveScore = opts['moveScore'] || Number.POSITIVE_INFINITY;
+      this.moveScoreAtNight = opts['moveScoreAtNight'] || this.moveScore;
+      this.impassable = opts['impassable'];
+    }
+
+    Terrain.prototype.isImpassable = function() {
+      return this.impassable != null;
+    };
+
+    return Terrain;
+
+  })();
+
+  terrainObjectCache = {};
+
+  Terrain.find = function(type) {
+    var _ref;
+    return (_ref = terrainObjectCache[type]) != null ? _ref : terrainObjectCache[type] = (function() {
+      if (TerrainType[type] == null) {
+        throw "No Terrain of type " + type + " found";
+      }
+      return new Terrain(TerrainType[type]);
+    })();
+  };
+
+  MageKnight.Terrain = Terrain;
+
+}).call(this);
+
+(function() {
   var TerrainMesh;
 
   TerrainMesh = (function() {
@@ -759,23 +875,95 @@
 }).call(this);
 
 (function() {
-  var Feature, Terrain, Tile, TileStack;
+  var AnimatedTerrainFiles, AnimatedTerrainView, TerrainFiles, TerrainView;
 
-  Terrain = {
-    types: ["grass", "forest", "hill", "mountain", "desert", "swamp", "wasteland", "water"],
-    next: function(type) {
-      var nextIndex;
-      nextIndex = this.types.indexOf(type) + 1;
-      nextIndex = nextIndex % this.types.length;
-      return this.types[nextIndex];
+  TerrainFiles = {
+    locateFile: function(terrainType) {
+      return "" + MageKnight.Loader.filePath + "terrain/" + this[terrainType] + ".png";
     },
-    find: function(name) {
-      return name;
+    grass: "grass",
+    desert: "desert",
+    forest: "forest",
+    hill: "hill",
+    mountain: "mountain",
+    water: "water/1",
+    swamp: "swamp",
+    wasteland: "wasteland"
+  };
+
+  AnimatedTerrainFiles = {
+    locateFile: function(terrainType) {
+      var fileName;
+      fileName = this[terrainType];
+      if (fileName != null) {
+        return "" + MageKnight.Loader.filePath + "terrain/" + fileName + ".png";
+      } else {
+        return null;
+      }
     },
-    random: function() {
-      return this.types[Math.floor(Math.random() * this.types.length)];
+    water: "water_animation"
+  };
+
+  TerrainView = {
+    create: function(terrain) {
+      var animationFile, baseTerrain, terrainFile;
+      terrainFile = TerrainFiles.locateFile(terrain.type);
+      if (terrainFile == null) {
+        throw "No terrain file in dictionary for:" + terrain;
+      }
+      baseTerrain = new createjs.Bitmap(terrainFile);
+      animationFile = AnimatedTerrainFiles.locateFile(terrain.type);
+      if (animationFile != null) {
+        return AnimatedTerrainView.create(baseTerrain, animationFile);
+      } else {
+        return baseTerrain;
+      }
     }
   };
+
+  AnimatedTerrainView = {
+    create: function(baseTerrain, animationFile) {
+      var animateCycle, animation, container, play, rewind, spriteSheet;
+      container = new createjs.Container;
+      spriteSheet = new createjs.SpriteSheet({
+        images: [animationFile],
+        frames: {
+          width: MageKnight.TileView.width,
+          height: MageKnight.TileView.height - 8,
+          count: 38
+        },
+        animations: {
+          run: [1, 38]
+        }
+      });
+      animation = new createjs.BitmapAnimation(spriteSheet);
+      play = function() {
+        return animation.play();
+      };
+      rewind = function() {
+        return animation.gotoAndStop("run");
+      };
+      animateCycle = function() {
+        play();
+        return setTimeout(function() {
+          rewind();
+          return setTimeout(function() {
+            return animateCycle();
+          }, 10000);
+        }, 2400);
+      };
+      animateCycle();
+      container.addChild(baseTerrain, animation);
+      return container;
+    }
+  };
+
+  MageKnight.TerrainView = TerrainView;
+
+}).call(this);
+
+(function() {
+  var Feature, Tile, TileStack;
 
   Feature = {
     types: [null, "village", "glade", "monastery", "minegreen", "minered", "mineblue", "minewhite", "orcs", "draconum", "keep", "magetower", "ruins", "dungeon", "tomb", "monsterden", "spawninggrounds", "cityblue", "cityred", "citygreen", "citywhite"],
@@ -799,7 +987,19 @@
       if (opts == null) {
         opts = {};
       }
-      this.terrain = opts['terrain'] || Terrain.find("grass");
+      this.terrain = (function() {
+        var terrain;
+        terrain = opts['terrain'];
+        if (terrain != null) {
+          if (_.isString(terrain)) {
+            return MageKnight.Terrain.find(terrain);
+          } else {
+            return terrain;
+          }
+        } else {
+          return MageKnight.Terrain.find("grass");
+        }
+      })();
       this.feature = opts['feature'] || null;
       this.position = opts['position'] || new MageKnight.HexCoordinate([]);
       this.firstTile = false;
@@ -817,16 +1017,6 @@
         feature: this.feature,
         position: this.position.array
       };
-    };
-
-    Tile.prototype.cycleTerrain = function() {
-      this.terrain = Terrain.next(this.terrain);
-      return this.notifyObservers();
-    };
-
-    Tile.prototype.cycleFeature = function() {
-      this.feature = Feature.next(this.feature);
-      return this.notifyObservers();
     };
 
     Tile.prototype.neighborAt = function(location) {
@@ -884,7 +1074,7 @@
     if (featureName == null) {
       featureName = null;
     }
-    terrain = Terrain.find(terrainName);
+    terrain = MageKnight.Terrain.find(terrainName);
     feature = Feature.find(featureName);
     return new Tile({
       terrain: terrain,
@@ -894,12 +1084,6 @@
 
   Tile.fromArray = function(orderedProperties) {
     return Tile.fromNames(orderedProperties[0], orderedProperties[1]);
-  };
-
-  Tile.generateRandom = function() {
-    return new Tile({
-      terrain: Terrain.random()
-    });
   };
 
   Tile.fromObject = function(tileObject) {
@@ -1371,7 +1555,7 @@
     }, {
       position: [2],
       terrain: 'forest',
-      feature: 'deepminegreenblue'
+      feature: 'deepminebluegreen'
     }, {
       position: [3],
       terrain: 'grass'
@@ -1652,6 +1836,8 @@
     }
   ];
 
+  TileStack.Core.City['v'] = TileStack.Special['v'];
+
   TileStack.Core.NonCity[9] = [
     {
       position: [],
@@ -1763,8 +1949,6 @@
 
   MageKnight.Tile = Tile;
 
-  MageKnight.Terrain = Terrain;
-
   MageKnight.Feature = Feature;
 
 }).call(this);
@@ -1787,16 +1971,6 @@
       4: [-2, 0],
       5: [-1, -1]
     },
-    terrainFileMap: {
-      grass: "grass",
-      desert: "desert",
-      forest: "forest",
-      hill: "hill",
-      mountain: "mountain",
-      water: "water/1",
-      swamp: "swamp",
-      wasteland: "wasteland"
-    },
     featureFileMap: {
       portal: "portal",
       village: "village",
@@ -1818,18 +1992,14 @@
       cityred: "city_red",
       cityblue: "city_blue",
       citygreen: "city_green",
-      citywhite: "city_white"
-    },
-    getTerrainView: function(terrain) {
-      var terrainView;
-      if (this.terrainFileMap[terrain] != null) {
-        terrainView = new createjs.Bitmap("" + Loader.filePath + "terrain/" + this.terrainFileMap[terrain] + ".png");
-      } else {
-        console.log("missing " + terrain + " file");
-        terrainView = new createjs.Shape();
-        terrainView.graphics.beginFill("red").drawCircle(0, 0, 90);
-      }
-      return terrainView;
+      citywhite: "city_white",
+      deepmineredwhite: "redwhitedeepmine",
+      deepminebluegreen: "greenbluedeepmine",
+      deepmineredwhitebluegreen: "4waydeepmine",
+      maze: "maze",
+      labyrinth: "labyrinth",
+      refugeecamp: "camp",
+      volkarescamp: "generalcamp"
     },
     getFeatureView: function(feature) {
       var featureView, terrainView;
@@ -1842,6 +2012,16 @@
       }
       return featureView;
     },
+    getMoveScoreOverlay: function(terrain) {
+      var moveScoreText;
+      if (!terrain.impassable) {
+        moveScoreText = new createjs.Text(terrain.moveScore, "150px Arial");
+        moveScoreText.alpha = .65;
+        moveScoreText.x = 30;
+        moveScoreText.y = 15;
+      }
+      return moveScoreText;
+    },
     fromModel: function(model) {
       var container, currentFeatureView, currentTerrainView, _ref,
         _this = this;
@@ -1850,11 +2030,12 @@
       currentTerrainView = null;
       currentFeatureView = null;
       container.updateByModel = function(model) {
-        var newFeatureView, newTerrainView;
-        newTerrainView = _this.getTerrainView(model.terrain);
+        var moveScoreOverlay, newFeatureView, newTerrainView;
+        newTerrainView = MageKnight.TerrainView.create(model.terrain);
         if (model.feature != null) {
           newFeatureView = _this.getFeatureView(model.feature);
         }
+        moveScoreOverlay = _this.getMoveScoreOverlay(model.terrain);
         if (currentTerrainView != null) {
           container.removeChild(currentTerrainView);
         }
@@ -1869,13 +2050,6 @@
       model.addObserver(function() {
         return container.updateByModel(model);
       });
-      container.onClick = function(event) {
-        if (event.nativeEvent.altKey) {
-          return model.cycleFeature();
-        } else {
-          return model.cycleTerrain();
-        }
-      };
       return container;
     },
     getNightFilter: function() {
@@ -1918,11 +2092,12 @@
       var centerPoint, container, hintOver, hintView, _ref, _ref1;
       hintView = new createjs.Shape();
       centerPoint = [TileView.width / 2, TileView.height / 2];
-      hintView.graphics.beginFill("#EEF5EE").drawCircle(0, 0, 220);
+      hintView.graphics.beginFill("#222").drawCircle(0, 0, 220);
       hintView.alpha = .5;
       _ref = TileView.transformByParity(centerPoint, hexordinate), hintView.x = _ref[0], hintView.y = _ref[1];
       hintOver = new createjs.Shape();
-      hintOver.graphics.beginStroke("green").drawCircle(0, 0, 50);
+      hintOver.graphics.beginFill("yellow").drawCircle(0, 0, 50);
+      hintOver.alpha = .25;
       _ref1 = TileView.transformByParity(centerPoint, hexordinate), hintOver.x = _ref1[0], hintOver.y = _ref1[1];
       container = new createjs.Container();
       container.addChild(hintView);
