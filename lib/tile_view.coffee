@@ -13,16 +13,6 @@ TileView =
     4: [-2, 0]
     5: [-1, -1]
 
-  terrainFileMap:
-    grass: "grass"
-    desert: "desert"
-    forest: "forest"
-    hill: "hill"
-    mountain: "mountain"
-    water: "water/1"
-    swamp: "swamp"
-    wasteland: "wasteland"
-
   featureFileMap:
     portal: "portal"
     village: "village"
@@ -47,11 +37,6 @@ TileView =
     citygreen: "city_green"
     citywhite: "city_white"
     refugeecamp: "camp"
-
-  getTerrainView: (terrain) ->
-    throw "No terrain file in dictionary for:" + terrain unless @terrainFileMap[terrain.type]?
-
-    new createjs.Bitmap("#{Loader.filePath}terrain/#{@terrainFileMap[terrain.type]}.png")
 
   getFeatureView: (feature) ->
     if @featureFileMap[feature]?
@@ -81,7 +66,7 @@ TileView =
     currentFeatureView = null
 
     container.updateByModel = (model) =>
-      newTerrainView = @getTerrainView(model.terrain)
+      newTerrainView = MageKnight.TerrainView.create(model.terrain)
       newFeatureView = @getFeatureView(model.feature) if model.feature?
       moveScoreOverlay = @getMoveScoreOverlay(model.terrain)
 
@@ -96,12 +81,6 @@ TileView =
       container.addChild(moveScoreOverlay)
 
     model.addObserver => container.updateByModel(model)
-
-    container.onClick = (event) ->
-      if event.nativeEvent.altKey
-        model.cycleFeature()
-      else
-        model.cycleTerrain()
 
     container
 
