@@ -62,13 +62,13 @@
       return this.getStage().removeAllChildren();
     },
     setMesh: function(mesh) {
-      var camera, cameraView, cloud, cloudTicker, clouds, controlPanel, getRandomCloud, i, newMeshButton, stage, terrainMeshView, _i, _len,
+      var camera, cameraView, cloud, cloudTicker, clouds, controlPanel, getRandomCloud, i, newMeshButton, stage, _i, _len,
         _this = this;
       this.terrainMesh = mesh;
       this.terrainMesh.addObserver(function() {
         return _this.save();
       });
-      terrainMeshView = new MageKnight.TerrainMeshView(mesh);
+      this.terrainMeshView = new MageKnight.TerrainMeshView(mesh);
       getRandomCloud = function() {
         var cloud, cloudFile, cloudNum, totalSpeed;
         cloudNum = Math.ceil(Math.random() * 6);
@@ -113,16 +113,19 @@
       setInterval(function() {
         return cloudTicker();
       }, 50);
-      camera = new MageKnight.Camera(terrainMeshView);
+      camera = new MageKnight.Camera(this.terrainMeshView);
       cameraView = new MageKnight.CameraView(camera);
-      newMeshButton = new MageKnight.Button("New", function() {
-        if (confirm("Are you sure?")) {
-          return _this.newMap();
+      newMeshButton = new MageKnight.ImageButton({
+        normal: "new",
+        action: function() {
+          if (confirm("Are you sure?")) {
+            return _this.newMap();
+          }
         }
       });
       controlPanel = new MageKnight.ControlPanelView(cameraView, newMeshButton);
       stage = this.getStage();
-      stage.addChild(terrainMeshView);
+      stage.addChild(this.terrainMeshView);
       for (_i = 0, _len = clouds.length; _i < _len; _i++) {
         cloud = clouds[_i];
         stage.addChild(cloud);
@@ -138,7 +141,15 @@
         _this.setMesh(terrainMesh);
         return terrainMesh;
       })();
+    },
+    toggleMove: function() {
+      MageKnight.ViewSettings.showMoveScore = !MageKnight.ViewSettings.showMoveScore;
+      return this.terrainMeshView.updateDisplayList();
     }
+  };
+
+  MageKnight.ViewSettings = {
+    showMoveScore: false
   };
 
   window.MageKnight = MageKnight;
@@ -146,7 +157,7 @@
 }).call(this);
 
 (function() {
-  var Button,
+  var Button, ImageButton,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -185,7 +196,42 @@
 
   })(createjs.Container);
 
+  ImageButton = (function(_super) {
+
+    __extends(ImageButton, _super);
+
+    function ImageButton(opts) {
+      var normalFile, normalImage, overFile, overImage,
+        _this = this;
+      if (opts == null) {
+        opts = {};
+      }
+      ImageButton.__super__.constructor.call(this);
+      normalFile = "" + MageKnight.Loader.filePath + "interface/" + opts.normal + ".png";
+      normalImage = new createjs.Bitmap(normalFile);
+      this.addChild(normalImage);
+      this.addEventListener("click", opts.action);
+      if (opts.noMouseOver == null) {
+        overFile = "" + MageKnight.Loader.filePath + "interface/" + opts.normal + "_over.png";
+        overImage = new createjs.Bitmap(overFile);
+        this.addEventListener("mouseover", function() {
+          _this.removeChild(normalImage);
+          return _this.addChild(overImage);
+        });
+        this.addEventListener("mouseout", function() {
+          _this.removeChild(overImage);
+          return _this.addChild(normalImage);
+        });
+      }
+    }
+
+    return ImageButton;
+
+  })(createjs.Container);
+
   MageKnight.Button = Button;
+
+  MageKnight.ImageButton = ImageButton;
 
 }).call(this);
 
@@ -256,22 +302,42 @@
       var down, left, right, up, zoomIn, zoomOut;
       this.camera = camera;
       CameraView.__super__.constructor.call(this);
-      left = new MageKnight.Button("<", this.camera.left);
-      left.x = 0;
-      left.y = 40;
-      right = new MageKnight.Button(">", this.camera.right);
-      right.x = 40;
-      right.y = 40;
-      up = new MageKnight.Button("^", this.camera.up);
-      up.x = 20;
-      up.y = 25;
-      down = new MageKnight.Button("V", this.camera.down);
-      down.x = 20;
-      down.y = 55;
-      zoomIn = new MageKnight.Button("+", this.camera.zoomIn);
-      zoomIn.x = 10;
-      zoomOut = new MageKnight.Button("-", this.camera.zoomOut);
-      zoomOut.x = 35;
+      left = new MageKnight.ImageButton({
+        normal: "left",
+        action: this.camera.left
+      });
+      left.x = 6;
+      left.y = 215;
+      right = new MageKnight.ImageButton({
+        normal: "right",
+        action: this.camera.right
+      });
+      right.x = 110;
+      right.y = 215;
+      up = new MageKnight.ImageButton({
+        normal: "up",
+        action: this.camera.up
+      });
+      up.x = 55;
+      up.y = 165;
+      down = new MageKnight.ImageButton({
+        normal: "down",
+        action: this.camera.down
+      });
+      down.x = 55;
+      down.y = 270;
+      zoomIn = new MageKnight.ImageButton({
+        normal: "zoomin",
+        action: this.camera.zoomIn
+      });
+      zoomIn.x = 20;
+      zoomIn.y = 400;
+      zoomOut = new MageKnight.ImageButton({
+        normal: "zoomout",
+        action: this.camera.zoomOut
+      });
+      zoomOut.x = 100;
+      zoomOut.y = 400;
       this.addChild(left, right, up, down, zoomIn, zoomOut);
     }
 
@@ -296,22 +362,23 @@
       this.cameraView = cameraView;
       ControlPanelView.__super__.constructor.call(this);
       this.dimensions = {
-        x: 460,
+        x: 442,
         y: 0,
-        width: 180,
+        width: 198,
         height: 480
       };
       this.collapsedCoordinates = {
-        x: 620,
+        x: 640,
         y: 0
       };
       this.hidden = true;
       this.doLayout();
       this.addBackground();
       this.addHideShowButton();
+      this.addMovementOverlay();
       this.addCamera();
-      newButton.x = 30;
-      newButton.y = this.dimensions.height - 30;
+      newButton.x = 10;
+      newButton.y = 35;
       this.addChild(newButton);
     }
 
@@ -326,21 +393,37 @@
     };
 
     ControlPanelView.prototype.addBackground = function() {
-      var shape;
-      shape = new createjs.Shape();
-      shape.graphics.beginFill("lightgray").drawRect(0, 0, this.dimensions.width, this.dimensions.height);
-      shape.alpha = 0.4;
-      return this.addChild(shape);
+      var background;
+      background = new createjs.Bitmap("" + MageKnight.Loader.filePath + "interface/background.png");
+      return this.addChild(background);
+    };
+
+    ControlPanelView.prototype.addMovementOverlay = function() {
+      var moveButton,
+        _this = this;
+      moveButton = new MageKnight.ImageButton({
+        normal: "movement",
+        action: function() {
+          return MageKnight.toggleMove();
+        }
+      });
+      moveButton.x = 10;
+      moveButton.y = 100;
+      return this.addChild(moveButton);
     };
 
     ControlPanelView.prototype.addHideShowButton = function() {
       var hsButton,
         _this = this;
-      hsButton = new MageKnight.Button(" ||", function() {
-        _this.hidden = !_this.hidden;
-        return _this.doLayout();
+      hsButton = new MageKnight.ImageButton({
+        normal: "lefttab",
+        noMouseOver: true,
+        action: function() {
+          _this.hidden = !_this.hidden;
+          return _this.doLayout();
+        }
       });
-      hsButton.y = this.dimensions.height / 2;
+      hsButton.x = -30;
       return this.addChild(hsButton);
     };
 
@@ -813,8 +896,9 @@
       this.updateDisplayList = __bind(this.updateDisplayList, this);
 
       TerrainMeshView.__super__.constructor.call(this);
-      this.x = 50;
-      this.y = 400;
+      this.x = 70;
+      this.y = 200;
+      this.rotation = 40;
       this.scaleX = .275;
       this.scaleY = .26;
       this.tileViewFactory = new MageKnight.TileViewCache();
@@ -841,6 +925,7 @@
         _results.push((function(tile) {
           var tileView;
           tileView = _this.tileViewFactory.findByModel(tile);
+          tileView.updateByModel(tile);
           return _this.addChild(tileView);
         })(tile));
       }
@@ -2015,27 +2100,26 @@
     getMoveScoreOverlay: function(terrain) {
       var moveScoreText;
       if (!terrain.impassable) {
-        moveScoreText = new createjs.Text(terrain.moveScore, "150px Arial");
-        moveScoreText.alpha = .65;
+        moveScoreText = new createjs.Text(terrain.moveScore, "150px Roboto");
+        moveScoreText.alpha = .5;
         moveScoreText.x = 30;
-        moveScoreText.y = 15;
       }
       return moveScoreText;
     },
     fromModel: function(model) {
-      var container, currentFeatureView, currentTerrainView, _ref,
+      var container, currentFeatureView, currentMoveScoreOverlay, currentTerrainView, _ref,
         _this = this;
       container = new createjs.Container();
       _ref = this.transformByParity([0, 0], model.position), container.x = _ref[0], container.y = _ref[1];
       currentTerrainView = null;
       currentFeatureView = null;
+      currentMoveScoreOverlay = null;
       container.updateByModel = function(model) {
-        var moveScoreOverlay, newFeatureView, newTerrainView;
+        var newFeatureView, newTerrainView;
         newTerrainView = MageKnight.TerrainView.create(model.terrain);
         if (model.feature != null) {
           newFeatureView = _this.getFeatureView(model.feature);
         }
-        moveScoreOverlay = _this.getMoveScoreOverlay(model.terrain);
         if (currentTerrainView != null) {
           container.removeChild(currentTerrainView);
         }
@@ -2045,7 +2129,15 @@
           container.removeChild(currentFeatureView);
         }
         container.addChild(newFeatureView);
-        return currentFeatureView = newFeatureView;
+        currentFeatureView = newFeatureView;
+        if (MageKnight.ViewSettings.showMoveScore) {
+          currentMoveScoreOverlay = _this.getMoveScoreOverlay(model.terrain);
+          return container.addChild(currentMoveScoreOverlay);
+        } else {
+          if (currentMoveScoreOverlay != null) {
+            return container.removeChild(currentMoveScoreOverlay);
+          }
+        }
       };
       model.addObserver(function() {
         return container.updateByModel(model);
