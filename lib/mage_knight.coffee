@@ -45,7 +45,7 @@ MageKnight =
   setMesh: (mesh) ->
     @terrainMesh = mesh
     @terrainMesh.addObserver => @save()
-    terrainMeshView = new MageKnight.TerrainMeshView(mesh)
+    @terrainMeshView = new MageKnight.TerrainMeshView(mesh)
 
     getRandomCloud = ->
       cloudNum = Math.ceil(Math.random()*6)
@@ -78,13 +78,13 @@ MageKnight =
       cloudTicker()
     , 50
 
-    camera = new MageKnight.Camera(terrainMeshView)
+    camera = new MageKnight.Camera(@terrainMeshView)
     cameraView = new MageKnight.CameraView(camera)
-    newMeshButton = new MageKnight.Button("New", => @newMap() if confirm("Are you sure?"))
+    newMeshButton = new MageKnight.ImageButton(normal: "new", action: => @newMap() if confirm("Are you sure?"))
     controlPanel = new MageKnight.ControlPanelView(cameraView, newMeshButton)
     
     stage = @getStage()
-    stage.addChild(terrainMeshView)
+    stage.addChild(@terrainMeshView)
     stage.addChild(cloud) for cloud in clouds
     stage.addChild(controlPanel)
 
@@ -95,5 +95,12 @@ MageKnight =
       @setMesh(terrainMesh)
 
       terrainMesh
+
+  toggleMove: ->
+    MageKnight.ViewSettings.showMoveScore = !MageKnight.ViewSettings.showMoveScore
+    @terrainMeshView.updateDisplayList()
+
+MageKnight.ViewSettings =
+  showMoveScore: false
 
 window.MageKnight = MageKnight

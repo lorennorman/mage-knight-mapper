@@ -26,4 +26,26 @@ class Button extends createjs.Container
       @removeChild(overBackground)
       @addChildAt(background, 0)
 
+class ImageButton extends createjs.Container
+  constructor: (opts={}) ->
+    super()
+
+    normalFile = "#{MageKnight.Loader.filePath}interface/#{opts.normal}.png"
+    normalImage = new createjs.Bitmap(normalFile)
+    @addChild(normalImage)
+
+    @addEventListener "click", opts.action
+
+    unless opts.noMouseOver?
+      overFile = "#{MageKnight.Loader.filePath}interface/#{opts.normal}_over.png"
+      overImage = new createjs.Bitmap(overFile)
+
+      @addEventListener "mouseover", =>
+        @removeChild(normalImage)
+        @addChild(overImage)
+      @addEventListener "mouseout", =>
+        @removeChild(overImage)
+        @addChild(normalImage)
+
 MageKnight.Button = Button
+MageKnight.ImageButton = ImageButton

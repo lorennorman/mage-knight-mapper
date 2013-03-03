@@ -71,11 +71,11 @@ TileView =
 
     currentTerrainView = null
     currentFeatureView = null
+    currentMoveScoreOverlay = null
 
     container.updateByModel = (model) =>
       newTerrainView = MageKnight.TerrainView.create(model.terrain)
       newFeatureView = @getFeatureView(model.feature) if model.feature?
-      moveScoreOverlay = @getMoveScoreOverlay(model.terrain)
 
       container.removeChild(currentTerrainView) if currentTerrainView?
       container.addChild(newTerrainView)
@@ -85,7 +85,11 @@ TileView =
       container.addChild(newFeatureView)
       currentFeatureView = newFeatureView
 
-      # container.addChild(moveScoreOverlay)
+      if MageKnight.ViewSettings.showMoveScore
+        currentMoveScoreOverlay = @getMoveScoreOverlay(model.terrain)
+        container.addChild(currentMoveScoreOverlay)
+      else
+        container.removeChild(currentMoveScoreOverlay) if currentMoveScoreOverlay?
 
     model.addObserver => container.updateByModel(model)
 

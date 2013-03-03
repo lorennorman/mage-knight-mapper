@@ -1,8 +1,9 @@
 class MageKnight.TerrainMeshView extends createjs.Container
   constructor: (@model) ->
     super()
-    @x = 50
-    @y = 400
+    @x = 70
+    @y = 200
+    @rotation = 40
     @scaleX = .275
     @scaleY = .26
 
@@ -22,6 +23,7 @@ class MageKnight.TerrainMeshView extends createjs.Container
     for tile in @model.revealedTiles()
       do (tile) =>
         tileView = @tileViewFactory.findByModel(tile)
+        tileView.updateByModel(tile)
         @addChild(tileView)
 
   addHintViews: ->

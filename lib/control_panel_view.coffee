@@ -2,13 +2,13 @@ class ControlPanelView extends createjs.Container
   constructor: (@cameraView, newButton) ->
     super()
     @dimensions =
-      x: 460
+      x: 442
       y: 0
-      width: 180
+      width: 198
       height: 480
 
     @collapsedCoordinates =
-      x: 620
+      x: 640
       y: 0
 
     @hidden = true
@@ -16,10 +16,11 @@ class ControlPanelView extends createjs.Container
     @doLayout()
     @addBackground()
     @addHideShowButton()
+    @addMovementOverlay()
     @addCamera()
 
-    newButton.x = 30
-    newButton.y = @dimensions.height - 30
+    newButton.x = 10
+    newButton.y = 35
     @addChild(newButton)
 
   doLayout: () ->
@@ -31,14 +32,21 @@ class ControlPanelView extends createjs.Container
       @y = @dimensions.y
 
   addBackground: () ->
-    shape = new createjs.Shape()
-    shape.graphics.beginFill("lightgray").drawRect(0, 0, @dimensions.width, @dimensions.height)
-    shape.alpha = 0.4
-    @addChild(shape)
+    background = new createjs.Bitmap("#{MageKnight.Loader.filePath}interface/background.png")
+    # shape = new createjs.Shape()
+    # shape.graphics.beginFill("lightgray").drawRect(0, 0, @dimensions.width, @dimensions.height)
+    # shape.alpha = 0.4
+    @addChild(background)
+
+  addMovementOverlay: () ->
+    moveButton = new MageKnight.ImageButton(normal: "movement", action: => MageKnight.toggleMove())
+    moveButton.x = 10
+    moveButton.y = 100
+    @addChild(moveButton)
 
   addHideShowButton: () ->
-    hsButton = new MageKnight.Button(" ||", => @hidden = !@hidden; @doLayout())
-    hsButton.y = @dimensions.height/2
+    hsButton = new MageKnight.ImageButton(normal: "lefttab", noMouseOver: true, action: => @hidden = !@hidden; @doLayout())
+    hsButton.x = -30
     @addChild(hsButton)
 
   addCamera: () ->
