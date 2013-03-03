@@ -57,10 +57,10 @@ TileView =
 
   getMoveScoreOverlay: (terrain) ->
     unless terrain.impassable
-      moveScoreText = new createjs.Text(terrain.moveScore, "150px Arial") 
-      moveScoreText.alpha = .65
+      moveScoreText = new createjs.Text(terrain.moveScore, "150px Roboto") 
+      moveScoreText.alpha = .5
       moveScoreText.x = 30
-      moveScoreText.y = 15
+      # moveScoreText.y = 10
 
     moveScoreText
 
