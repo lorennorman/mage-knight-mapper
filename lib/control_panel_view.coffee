@@ -2,13 +2,13 @@ class ControlPanelView extends createjs.Container
   constructor: (@cameraView, newButton) ->
     super()
     @dimensions =
-      x: 442
+      x: 1082
       y: 0
       width: 198
       height: 480
 
     @collapsedCoordinates =
-      x: 640
+      x: 1280
       y: 0
 
     @hidden = true

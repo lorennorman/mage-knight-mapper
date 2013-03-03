@@ -362,13 +362,13 @@
       this.cameraView = cameraView;
       ControlPanelView.__super__.constructor.call(this);
       this.dimensions = {
-        x: 442,
+        x: 1082,
         y: 0,
         width: 198,
         height: 480
       };
       this.collapsedCoordinates = {
-        x: 640,
+        x: 1280,
         y: 0
       };
       this.hidden = true;
@@ -896,11 +896,11 @@
       this.updateDisplayList = __bind(this.updateDisplayList, this);
 
       TerrainMeshView.__super__.constructor.call(this);
-      this.x = 70;
-      this.y = 200;
+      this.x = 140;
+      this.y = 400;
       this.rotation = 40;
-      this.scaleX = .275;
-      this.scaleY = .26;
+      this.scaleX = .55;
+      this.scaleY = .52;
       this.tileViewFactory = new MageKnight.TileViewCache();
       this.model.addObserver(this.updateDisplayList);
     }
