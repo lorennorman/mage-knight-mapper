@@ -62,7 +62,7 @@
       return this.getStage().removeAllChildren();
     },
     setMesh: function(mesh) {
-      var camera, cameraView, cloud, cloudTicker, clouds, controlPanel, getRandomCloud, i, newMeshButton, stage, _i, _len,
+      var camera, cameraView, cards, cloud, cloudTicker, clouds, controlPanel, getRandomCloud, i, newMeshButton, stage, _i, _len,
         _this = this;
       this.terrainMesh = mesh;
       this.terrainMesh.addObserver(function() {
@@ -124,6 +124,9 @@
         }
       });
       controlPanel = new MageKnight.ControlPanelView(cameraView, newMeshButton);
+      cards = new createjs.Bitmap("" + MageKnight.Loader.filePath + "interface/reference_cards/city.png");
+      cards.scaleX = 2.5;
+      cards.scaleY = 2.5;
       stage = this.getStage();
       stage.addChild(this.terrainMeshView);
       for (_i = 0, _len = clouds.length; _i < _len; _i++) {
@@ -361,10 +364,11 @@
     function ControlPanelView(cameraView, newButton) {
       this.cameraView = cameraView;
       ControlPanelView.__super__.constructor.call(this);
+      this.scaleX = this.scaleY = 2;
       this.dimensions = {
-        x: 1082,
+        x: 884,
         y: 0,
-        width: 198,
+        width: 396,
         height: 480
       };
       this.collapsedCoordinates = {
@@ -384,11 +388,25 @@
 
     ControlPanelView.prototype.doLayout = function() {
       if (this.hidden) {
-        this.x = this.collapsedCoordinates.x;
-        return this.y = this.collapsedCoordinates.y;
+        createjs.Tween.get(this).to({
+          alpha: .5
+        }, 800);
+        createjs.Tween.get(this).to({
+          x: this.collapsedCoordinates.x
+        }, 1000, createjs.Ease.quintOut);
+        return createjs.Tween.get(this).to({
+          y: this.collapsedCoordinates.y
+        }, 1000, createjs.Ease.quintOut);
       } else {
-        this.x = this.dimensions.x;
-        return this.y = this.dimensions.y;
+        createjs.Tween.get(this).to({
+          alpha: 1
+        }, 800);
+        createjs.Tween.get(this).to({
+          x: this.dimensions.x
+        }, 1000, createjs.Ease.quintOut);
+        return createjs.Tween.get(this).to({
+          y: this.dimensions.y
+        }, 1000, createjs.Ease.quintOut);
       }
     };
 
@@ -899,8 +917,8 @@
       this.x = 140;
       this.y = 400;
       this.rotation = 40;
-      this.scaleX = .55;
-      this.scaleY = .52;
+      this.scaleX = .5;
+      this.scaleY = .5;
       this.tileViewFactory = new MageKnight.TileViewCache();
       this.model.addObserver(this.updateDisplayList);
     }
@@ -2141,6 +2159,15 @@
       };
       model.addObserver(function() {
         return container.updateByModel(model);
+      });
+      container.alpha = 0;
+      setTimeout(function() {
+        createjs.Tween.get(container).to({
+          alpha: 1
+        }, 5000, createjs.Ease.quintOut);
+        return createjs.Tween.get(container).to({
+          rotation: 360
+        }, 3000, createjs.Ease.quintOut);
       });
       return container;
     },

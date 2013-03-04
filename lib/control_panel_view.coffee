@@ -1,10 +1,13 @@
 class ControlPanelView extends createjs.Container
   constructor: (@cameraView, newButton) ->
     super()
+
+    @scaleX = @scaleY = 2
+
     @dimensions =
-      x: 1082
+      x: 884
       y: 0
-      width: 198
+      width: 396
       height: 480
 
     @collapsedCoordinates =
@@ -25,17 +28,16 @@ class ControlPanelView extends createjs.Container
 
   doLayout: () ->
     if @hidden
-      @x = @collapsedCoordinates.x
-      @y = @collapsedCoordinates.y
+      createjs.Tween.get(this).to({alpha:.5}, 800)
+      createjs.Tween.get(this).to({x:@collapsedCoordinates.x}, 1000, createjs.Ease.quintOut)
+      createjs.Tween.get(this).to({y: @.collapsedCoordinates.y}, 1000, createjs.Ease.quintOut)
     else
-      @x = @dimensions.x
-      @y = @dimensions.y
+      createjs.Tween.get(this).to({alpha: 1}, 800)
+      createjs.Tween.get(this).to({x: @dimensions.x}, 1000, createjs.Ease.quintOut)
+      createjs.Tween.get(this).to({y: @dimensions.y}, 1000, createjs.Ease.quintOut)
 
   addBackground: () ->
     background = new createjs.Bitmap("#{MageKnight.Loader.filePath}interface/background.png")
-    # shape = new createjs.Shape()
-    # shape.graphics.beginFill("lightgray").drawRect(0, 0, @dimensions.width, @dimensions.height)
-    # shape.alpha = 0.4
     @addChild(background)
 
   addMovementOverlay: () ->

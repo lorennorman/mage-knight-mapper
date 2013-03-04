@@ -4,8 +4,8 @@ class MageKnight.TerrainMeshView extends createjs.Container
     @x = 140
     @y = 400
     @rotation = 40
-    @scaleX = .55
-    @scaleY = .52
+    @scaleX = .5
+    @scaleY = .5
 
     @tileViewFactory = new MageKnight.TileViewCache()
 

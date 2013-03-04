@@ -93,6 +93,12 @@ TileView =
 
     model.addObserver => container.updateByModel(model)
 
+    # fade in the tiles
+    container.alpha = 0
+    setTimeout ->
+      createjs.Tween.get(container).to({alpha: 1}, 5000, createjs.Ease.quintOut)
+      createjs.Tween.get(container).to({rotation: 360}, 3000, createjs.Ease.quintOut) 
+
     container
 
   getNightFilter: ->
