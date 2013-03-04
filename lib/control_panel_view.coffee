@@ -1,35 +1,36 @@
 class ControlPanelView extends createjs.Container
-  constructor: (@cameraView, newButton) ->
+  constructor: (@cameraView) ->
     super()
-
-    @scaleX = @scaleY = 2
-
-    @dimensions =
-      x: 884
-      y: 0
-      width: 396
-      height: 480
-
-    @collapsedCoordinates =
-      x: 1280
-      y: 0
-
-    @hidden = true
 
     @doLayout()
     @addBackground()
     @addHideShowButton()
+    @addNewButton()
     @addMovementOverlay()
     @addCamera()
 
-    newButton.x = 10
-    newButton.y = 35
-    @addChild(newButton)
+  scaleX: 2
+  scaleY: 2
+  hidden: true
+
+  collapsedCoordinates:
+    x: 1280
+    y: 0
+
+  dimensions:
+    x: 884
+    y: 0
+    width: 396
+    height: 480
+
+  toggleVisibility: () =>
+    @hidden = !@hidden
+    @doLayout()
 
   doLayout: () ->
     if @hidden
-      createjs.Tween.get(this).to({alpha:.5}, 800)
-      createjs.Tween.get(this).to({x:@collapsedCoordinates.x}, 1000, createjs.Ease.quintOut)
+      createjs.Tween.get(this).to({alpha: .5}, 800)
+      createjs.Tween.get(this).to({x: @collapsedCoordinates.x}, 1000, createjs.Ease.quintOut)
       createjs.Tween.get(this).to({y: @.collapsedCoordinates.y}, 1000, createjs.Ease.quintOut)
     else
       createjs.Tween.get(this).to({alpha: 1}, 800)
@@ -40,16 +41,22 @@ class ControlPanelView extends createjs.Container
     background = new createjs.Bitmap("#{MageKnight.Loader.filePath}interface/background.png")
     @addChild(background)
 
+  addHideShowButton: () ->
+    hsButton = new MageKnight.ImageButton(normal: "lefttab", noMouseOver: true, action: @toggleVisibility)
+    hsButton.x = -30
+    @addChild(hsButton)
+
+  addNewButton: () ->
+    newButton = new MageKnight.ImageButton(normal: "new", action: => MageKnight.newMap() if confirm("Are you sure?"))
+    newButton.x = 10
+    newButton.y = 35
+    @addChild(newButton)
+
   addMovementOverlay: () ->
     moveButton = new MageKnight.ImageButton(normal: "movement", action: => MageKnight.toggleMove())
     moveButton.x = 10
     moveButton.y = 100
     @addChild(moveButton)
-
-  addHideShowButton: () ->
-    hsButton = new MageKnight.ImageButton(normal: "lefttab", noMouseOver: true, action: => @hidden = !@hidden; @doLayout())
-    hsButton.x = -30
-    @addChild(hsButton)
 
   addCamera: () ->
     @cameraView.x = 20
