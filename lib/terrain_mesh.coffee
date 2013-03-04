@@ -33,7 +33,7 @@ class TerrainMesh
 
     checkAdjacencies(new MageKnight.HexCoordinate([]))
 
-    answers
+    (_ answers).uniq(false, (answer) -> answer.toString())
 
   addFirstTile: (tile) ->
     if @_originTile?

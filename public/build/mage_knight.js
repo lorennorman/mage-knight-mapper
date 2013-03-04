@@ -738,7 +738,9 @@
         });
       };
       checkAdjacencies(new MageKnight.HexCoordinate([]));
-      return answers;
+      return (_(answers)).uniq(false, function(answer) {
+        return answer.toString();
+      });
     };
 
     TerrainMesh.prototype.addFirstTile = function(tile) {
@@ -2162,12 +2164,9 @@
       });
       container.alpha = 0;
       setTimeout(function() {
-        createjs.Tween.get(container).to({
+        return createjs.Tween.get(container).to({
           alpha: 1
         }, 5000, createjs.Ease.quintOut);
-        return createjs.Tween.get(container).to({
-          rotation: 360
-        }, 3000, createjs.Ease.quintOut);
       });
       return container;
     },
@@ -2208,25 +2207,24 @@
 
   HintView = {
     fromHexordinate: function(hexordinate) {
-      var centerPoint, container, hintOver, hintView, _ref, _ref1;
-      hintView = new createjs.Shape();
-      centerPoint = [TileView.width / 2, TileView.height / 2];
-      hintView.graphics.beginFill("#222").drawCircle(0, 0, 220);
-      hintView.alpha = .5;
+      var centerPoint, hintView, _ref;
+      hintView = new createjs.Bitmap("" + MageKnight.Loader.filePath + "interface/7hex.png");
+      centerPoint = [-TileView.width, -TileView.height * 2 / 3];
+      hintView.alpha = .25;
       _ref = TileView.transformByParity(centerPoint, hexordinate), hintView.x = _ref[0], hintView.y = _ref[1];
-      hintOver = new createjs.Shape();
-      hintOver.graphics.beginFill("yellow").drawCircle(0, 0, 50);
-      hintOver.alpha = .25;
-      _ref1 = TileView.transformByParity(centerPoint, hexordinate), hintOver.x = _ref1[0], hintOver.y = _ref1[1];
-      container = new createjs.Container();
-      container.addChild(hintView);
-      container.onMouseOver = function() {
-        return container.addChild(hintOver);
+      hintView.onMouseOver = function() {
+        return createjs.Tween.get(hintView).to({
+          alpha: .7
+        }, 500, createjs.Ease.quartOut);
       };
-      container.onMouseOut = function() {
-        return container.removeChild(hintOver);
+      hintView.onMouseOut = function() {
+        return createjs.Tween.get(hintView, {
+          override: true
+        }).to({
+          alpha: .25
+        }, 300, createjs.Ease.quartOut);
       };
-      return container;
+      return hintView;
     }
   };
 

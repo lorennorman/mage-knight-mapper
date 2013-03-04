@@ -97,7 +97,6 @@ TileView =
     container.alpha = 0
     setTimeout ->
       createjs.Tween.get(container).to({alpha: 1}, 5000, createjs.Ease.quintOut)
-      createjs.Tween.get(container).to({rotation: 360}, 3000, createjs.Ease.quintOut) 
 
     container
 
@@ -127,27 +126,18 @@ TileView =
 
 HintView =
   fromHexordinate: (hexordinate) ->
-    hintView = new createjs.Shape()
-    centerPoint = [TileView.width/2, TileView.height/2]
-    hintView.graphics.beginFill("#222").drawCircle(0, 0, 220)
-    hintView.alpha = .5
+    hintView = new createjs.Bitmap("#{MageKnight.Loader.filePath}interface/7hex.png")
+    centerPoint = [-TileView.width, -TileView.height*2/3]
+    hintView.alpha = .25
     [hintView.x, hintView.y] = TileView.transformByParity(centerPoint, hexordinate)
-    
-    hintOver = new createjs.Shape()
-    hintOver.graphics.beginFill("yellow").drawCircle(0, 0, 50)
-    hintOver.alpha = .25
-    [hintOver.x, hintOver.y] = TileView.transformByParity(centerPoint, hexordinate)
 
-    container = new createjs.Container()
-    container.addChild(hintView)
+    hintView.onMouseOver = ->
+      createjs.Tween.get(hintView).to({alpha: .7}, 500, createjs.Ease.quartOut)
 
-    container.onMouseOver = ->
-      container.addChild(hintOver)
+    hintView.onMouseOut = ->
+      createjs.Tween.get(hintView, override: true).to({alpha: .25}, 300, createjs.Ease.quartOut)
 
-    container.onMouseOut = ->
-      container.removeChild(hintOver)
-
-    container
+    hintView
 
 class TileViewCache
   findByModel: (model) ->
