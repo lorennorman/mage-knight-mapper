@@ -1,8 +1,8 @@
 class TerrainMesh
   constructor: (opts={}) ->
+    MageKnight.Util.makeObservable(this)
     @tiles = {}
     @groupTiles = []
-    @observers = []
     @tileStack = opts['tileStack'] or new MageKnight.TileStack
 
   toObject: ->
@@ -107,16 +107,6 @@ class TerrainMesh
 
   nextTileGroup: ->
     @tileStack.next()
-
-  addObserver: (observer) ->
-    @observers.push observer
-    @notifyObserver(observer)
-
-  notifyObservers: () ->
-    @notifyObserver(observer) for observer in @observers
-
-  notifyObserver: (observer) ->
-    observer.notify?() or observer()
 
 TerrainMesh.fromObject = (object) ->
   tiles = (MageKnight.Tile.fromObject(tileObject) for tileObject in object.tiles)

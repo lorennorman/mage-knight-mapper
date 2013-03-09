@@ -48,12 +48,12 @@ MageKnight =
     @terrainMeshView = new MageKnight.TerrainMeshView(mesh)
 
     clouds = (MageKnight.Cloud.random() for i in [1..8])
-    camera = new MageKnight.Camera(@terrainMeshView)
-    cameraView = new MageKnight.CameraView(camera)
-    controlPanel = new MageKnight.ControlPanelView(cameraView)
+    @cameraView = new MageKnight.CameraView(@terrainMeshView)
+    cameraControls = new MageKnight.CameraControlsView(@cameraView)
+    controlPanel = new MageKnight.ControlPanelView(cameraControls)
 
     stage = @getStage()
-    stage.addChild(@terrainMeshView)
+    stage.addChild(@cameraView)
     stage.addChild(cloud) for cloud in clouds
     stage.addChild(controlPanel)
 
@@ -61,7 +61,18 @@ MageKnight =
     MageKnight.ViewSettings.showMoveScore = !MageKnight.ViewSettings.showMoveScore
     @terrainMeshView.updateDisplayList()
 
+  setDay: ->
+    unless MageKnight.ViewSettings.isDay
+      MageKnight.ViewSettings.isDay = true
+      @terrainMeshView.updateDisplayList()
+
+  setNight: ->
+    if MageKnight.ViewSettings.isDay
+      MageKnight.ViewSettings.isDay = false
+      @terrainMeshView.updateDisplayList()
+
 MageKnight.ViewSettings =
   showMoveScore: false
+  isDay: true
 
 window.MageKnight = MageKnight

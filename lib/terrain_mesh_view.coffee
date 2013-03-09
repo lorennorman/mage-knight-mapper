@@ -1,6 +1,8 @@
 class MageKnight.TerrainMeshView extends createjs.Container
   constructor: (@model) ->
     super()
+    MageKnight.Util.makeObservable(this)
+
     @x = 140
     @y = 400
     @rotation = 40
@@ -15,6 +17,7 @@ class MageKnight.TerrainMeshView extends createjs.Container
     @clearViews()
     @addHintViews()
     @addTileViews()
+    @notifyObservers()
 
   clearViews: ->
     @removeAllChildren()
@@ -34,3 +37,4 @@ class MageKnight.TerrainMeshView extends createjs.Container
           @model.addNextTileGroupAt(location) if confirm("Reveal Tile?")
 
         @addChild(hintView)
+

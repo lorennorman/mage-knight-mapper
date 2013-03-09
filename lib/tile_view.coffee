@@ -5,14 +5,6 @@ TileView =
   width: 150
   height: 196
 
-  parityChart: 
-    0: [1, -1]
-    1: [2, 0]
-    2: [1, 1]
-    3: [-1, 1]
-    4: [-2, 0]
-    5: [-1, -1]
-
   featureFileMap:
     portal: "portal"
     village: "village"
@@ -66,8 +58,11 @@ TileView =
 
   fromModel: (model) ->
     container = new createjs.Container()
+    @nightFilter ?= MageKnight.Util.getNightFilter()
 
-    [container.x, container.y] = @transformByParity([0, 0], model.position)
+    [container.x, container.y] = model.position.applyParityTo([0, 0])
+    container.x = TileView.width*container.x/2
+    container.y = TileView.height*container.y*2/3
 
     currentTerrainView = null
     currentFeatureView = null
@@ -91,45 +86,34 @@ TileView =
       else
         container.removeChild(currentMoveScoreOverlay) if currentMoveScoreOverlay?
 
+      if MageKnight.ViewSettings.isDay
+        container.uncache()
+        container.filters = []
+      else
+        container.filters = [@nightFilter]
+        setTimeout ->
+          container.cache(0,0, TileView.width, TileView.height)
+          setTimeout ->
+            container.updateCache()
+          , 100
+
     model.addObserver => container.updateByModel(model)
 
     # fade in the tiles
-    container.alpha = 0
-    setTimeout ->
-      createjs.Tween.get(container).to({alpha: 1}, 5000, createjs.Ease.quintOut)
+    if MageKnight.ViewSettings.isDay
+      container.alpha = 0
+      setTimeout ->
+        createjs.Tween.get(container).to({alpha: 1}, 5000, createjs.Ease.quintOut)
 
     container
-
-  getNightFilter: ->
-    throw "You must have the external Filters included!" unless createjs.ColorMatrix and createjs.ColorMatrixFilter
-
-    brightness = -5
-    contrast = 0
-    saturation = -35
-    hue = -82
-    colorMatrix = new createjs.ColorMatrix(brightness, contrast, saturation, hue)
-    colorMatrixFilter = new createjs.ColorMatrixFilter(colorMatrix)    
-
-  transformByParity: (coordinate, hexordinates) ->
-    transformedX = coordinate[0]
-    transformedY = coordinate[1]
-
-    for hexordinate in hexordinates.array
-      do (hexordinate) =>
-        parity = @parityChart[hexordinate]
-        throw "What neighbor is this? #{direction}" unless parity?
-
-        transformedX += @width*parity[0]/2
-        transformedY += 2*@height*parity[1]/3
-
-    [transformedX, transformedY]
 
 HintView =
   fromHexordinate: (hexordinate) ->
     hintView = new createjs.Bitmap("#{MageKnight.Loader.filePath}interface/7hex.png")
-    centerPoint = [-TileView.width, -TileView.height*2/3]
     hintView.alpha = .25
-    [hintView.x, hintView.y] = TileView.transformByParity(centerPoint, hexordinate)
+    [hintView.x, hintView.y] = hexordinate.applyParityTo([0, 0])
+    hintView.x = TileView.width*hintView.x/2-TileView.width
+    hintView.y = TileView.height*hintView.y*2/3-TileView.height*2/3
 
     hintView.onMouseOver = ->
       createjs.Tween.get(hintView).to({alpha: .7}, 500, createjs.Ease.quartOut)

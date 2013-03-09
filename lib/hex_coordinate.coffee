@@ -1,6 +1,14 @@
 class ValidationError extends MageKnight.Error
 
 class HexCoordinate
+  parityChart: 
+    0: [1, -1]
+    1: [2, 0]
+    2: [1, 1]
+    3: [-1, 1]
+    4: [-2, 0]
+    5: [-1, -1]
+
   constructor: (array) ->
     @array = HexCoordinate.validate(array)
 
@@ -30,6 +38,20 @@ class HexCoordinate
       new HexCoordinate(@array.concat([4, 4, 5])),
       new HexCoordinate(@array.concat([5, 5, 0]))
     ]
+
+  applyParityTo: (coordinate) ->
+    transformedX = coordinate[0]
+    transformedY = coordinate[1]
+
+    for hexordinate in @array
+      do (hexordinate) =>
+        parity = @parityChart[hexordinate]
+        throw "What neighbor is this? #{direction}" unless parity?
+
+        transformedX += parity[0]
+        transformedY += parity[1]
+
+    [transformedX, transformedY]
     
 HexCoordinate.validate = (array) ->
   array = array.array or array

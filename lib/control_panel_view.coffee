@@ -1,5 +1,5 @@
 class ControlPanelView extends createjs.Container
-  constructor: (@cameraView) ->
+  constructor: (@cameraControlsView) ->
     super()
 
     @doLayout()
@@ -7,6 +7,7 @@ class ControlPanelView extends createjs.Container
     @addHideShowButton()
     @addNewButton()
     @addMovementOverlay()
+    @addDayNightButtons()
     @addCamera()
 
   hidden: true
@@ -57,8 +58,18 @@ class ControlPanelView extends createjs.Container
     moveButton.y = 152
     @addChild(moveButton)
 
+  addDayNightButtons: () ->
+    dayButton = new MageKnight.ImageButton(normal: "day", action: => MageKnight.setDay())    
+    dayButton.x = 37
+    dayButton.y = 237
+    @addChild dayButton
+    nightButton = new MageKnight.ImageButton(normal: "night", action: => MageKnight.setNight())    
+    nightButton.x = 168
+    nightButton.y = 237
+    @addChild nightButton
+
   addCamera: () ->
-    @cameraView.x = 20
-    @addChild(@cameraView)
+    @cameraControlsView.x = 20
+    @addChild(@cameraControlsView)
 
 MageKnight.ControlPanelView = ControlPanelView

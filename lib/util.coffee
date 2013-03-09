@@ -29,3 +29,31 @@ MageKnight.Util =
       grasslands: grasslands,
       coreNonCity: nonCity,
       coreCity: city)
+
+  getNightFilter: ->
+    throw "You must have the external Filters included!" unless createjs.ColorMatrix and createjs.ColorMatrixFilter
+
+    brightness = -5
+    contrast = 0
+    saturation = -35
+    hue = -82
+    colorMatrix = new createjs.ColorMatrix(brightness, contrast, saturation, hue)
+
+    new createjs.ColorMatrixFilter(colorMatrix)
+
+  makeObservable: (toObserve) ->
+    (_ toObserve).extend(_.clone Observable)
+
+Observable =
+  getObservers: ->
+    @observers ?= []
+
+  addObserver: (observer) ->
+    @getObservers().push observer
+    @notifyObserver(observer)
+
+  notifyObservers: () ->
+    @notifyObserver(observer) for observer in @getObservers()
+
+  notifyObserver: (observer) ->
+    observer.notify?() or observer()
