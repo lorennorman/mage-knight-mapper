@@ -62,71 +62,24 @@
       return this.getStage().removeAllChildren();
     },
     setMesh: function(mesh) {
-      var camera, cameraView, cards, cloud, cloudTicker, clouds, controlPanel, getRandomCloud, i, newMeshButton, stage, _i, _len,
+      var camera, cameraView, cloud, clouds, controlPanel, i, stage, _i, _len,
         _this = this;
       this.terrainMesh = mesh;
       this.terrainMesh.addObserver(function() {
         return _this.save();
       });
       this.terrainMeshView = new MageKnight.TerrainMeshView(mesh);
-      getRandomCloud = function() {
-        var cloud, cloudFile, cloudNum, totalSpeed;
-        cloudNum = Math.ceil(Math.random() * 6);
-        cloudFile = "" + MageKnight.Loader.filePath + "clouds/cloud" + cloudNum + ".png";
-        cloud = new createjs.Bitmap(cloudFile);
-        cloud.x = Math.random() * 640 - 220;
-        cloud.y = Math.random() * 480;
-        cloud.scaleX = cloud.scaleY = .33 + Math.random() / 4;
-        cloud.alpha = .33 + Math.random() / 4;
-        cloud.rotation = 315;
-        totalSpeed = .75 + Math.random();
-        cloud._speedX = totalSpeed / 2;
-        cloud._speedY = -totalSpeed / 4;
-        return cloud;
-      };
       clouds = (function() {
         var _i, _results;
         _results = [];
-        for (i = _i = 1; _i <= 10; i = ++_i) {
-          _results.push(getRandomCloud());
+        for (i = _i = 1; _i <= 8; i = ++_i) {
+          _results.push(MageKnight.Cloud.random());
         }
         return _results;
       })();
-      cloudTicker = function() {
-        var cloud, _i, _len, _results;
-        _results = [];
-        for (_i = 0, _len = clouds.length; _i < _len; _i++) {
-          cloud = clouds[_i];
-          _results.push((function(cloud) {
-            if (cloud.x > 860) {
-              cloud.x = -220;
-            }
-            if (cloud.y < -140) {
-              cloud.y = 620;
-            }
-            cloud.x += cloud._speedX;
-            return cloud.y += cloud._speedY;
-          })(cloud));
-        }
-        return _results;
-      };
-      setInterval(function() {
-        return cloudTicker();
-      }, 50);
       camera = new MageKnight.Camera(this.terrainMeshView);
       cameraView = new MageKnight.CameraView(camera);
-      newMeshButton = new MageKnight.ImageButton({
-        normal: "new",
-        action: function() {
-          if (confirm("Are you sure?")) {
-            return _this.newMap();
-          }
-        }
-      });
-      controlPanel = new MageKnight.ControlPanelView(cameraView, newMeshButton);
-      cards = new createjs.Bitmap("" + MageKnight.Loader.filePath + "interface/reference_cards/city.png");
-      cards.scaleX = 2.5;
-      cards.scaleY = 2.5;
+      controlPanel = new MageKnight.ControlPanelView(cameraView);
       stage = this.getStage();
       stage.addChild(this.terrainMeshView);
       for (_i = 0, _len = clouds.length; _i < _len; _i++) {
@@ -134,16 +87,6 @@
         stage.addChild(cloud);
       }
       return stage.addChild(controlPanel);
-    },
-    bootstrap: function() {
-      var _ref,
-        _this = this;
-      return (_ref = this.terrainMesh) != null ? _ref : this.terrainMesh = (function() {
-        var terrainMesh;
-        terrainMesh = new MageKnight.TerrainMesh();
-        _this.setMesh(terrainMesh);
-        return terrainMesh;
-      })();
     },
     toggleMove: function() {
       MageKnight.ViewSettings.showMoveScore = !MageKnight.ViewSettings.showMoveScore;
@@ -210,12 +153,12 @@
         opts = {};
       }
       ImageButton.__super__.constructor.call(this);
-      normalFile = "" + MageKnight.Loader.filePath + "interface/" + opts.normal + ".png";
+      normalFile = "" + MageKnight.Loader.filePath + "interface/buttons/" + opts.normal + "_up.png";
       normalImage = new createjs.Bitmap(normalFile);
       this.addChild(normalImage);
       this.addEventListener("click", opts.action);
       if (opts.noMouseOver == null) {
-        overFile = "" + MageKnight.Loader.filePath + "interface/" + opts.normal + "_over.png";
+        overFile = "" + MageKnight.Loader.filePath + "interface/buttons/" + opts.normal + "_over.png";
         overImage = new createjs.Bitmap(overFile);
         this.addEventListener("mouseover", function() {
           _this.removeChild(normalImage);
@@ -261,19 +204,19 @@
     }
 
     Camera.prototype.left = function() {
-      return this.view.x += 50;
-    };
-
-    Camera.prototype.right = function() {
-      return this.view.x -= 50;
-    };
-
-    Camera.prototype.up = function() {
       return this.view.y += 50;
     };
 
-    Camera.prototype.down = function() {
+    Camera.prototype.right = function() {
       return this.view.y -= 50;
+    };
+
+    Camera.prototype.up = function() {
+      return this.view.x -= 50;
+    };
+
+    Camera.prototype.down = function() {
+      return this.view.x += 50;
     };
 
     Camera.prototype.zoomIn = function() {
@@ -309,38 +252,38 @@
         normal: "left",
         action: this.camera.left
       });
-      left.x = 6;
-      left.y = 215;
+      left.x = 525;
+      left.y = 145;
       right = new MageKnight.ImageButton({
         normal: "right",
         action: this.camera.right
       });
-      right.x = 110;
-      right.y = 215;
+      right.x = 675;
+      right.y = 145;
       up = new MageKnight.ImageButton({
         normal: "up",
         action: this.camera.up
       });
-      up.x = 55;
-      up.y = 165;
+      up.x = 600;
+      up.y = 70;
       down = new MageKnight.ImageButton({
         normal: "down",
         action: this.camera.down
       });
-      down.x = 55;
-      down.y = 270;
+      down.x = 600;
+      down.y = 215;
       zoomIn = new MageKnight.ImageButton({
         normal: "zoomin",
         action: this.camera.zoomIn
       });
-      zoomIn.x = 20;
-      zoomIn.y = 400;
+      zoomIn.x = 800;
+      zoomIn.y = 125;
       zoomOut = new MageKnight.ImageButton({
         normal: "zoomout",
         action: this.camera.zoomOut
       });
-      zoomOut.x = 100;
-      zoomOut.y = 400;
+      zoomOut.x = 800;
+      zoomOut.y = 195;
       this.addChild(left, right, up, down, zoomIn, zoomOut);
     }
 
@@ -353,7 +296,87 @@
 }).call(this);
 
 (function() {
+  var Cloud;
+
+  Cloud = (function() {
+
+    function Cloud(cloudNum) {
+      var cloudFile;
+      cloudFile = "" + MageKnight.Loader.filePath + "clouds/cloud" + cloudNum + ".png";
+      (_(this)).extend(new createjs.Bitmap(cloudFile));
+      Cloud.getTicker().items.push(this);
+    }
+
+    Cloud.prototype._speedX = 0;
+
+    Cloud.prototype._speedY = 0;
+
+    Cloud.prototype._minX = -350;
+
+    Cloud.prototype._maxX = 1440;
+
+    Cloud.prototype._minY = -200;
+
+    Cloud.prototype._maxY = 1100;
+
+    Cloud.prototype.update = function() {
+      if (this.x > this._maxX) {
+        this.x = this._minX;
+      }
+      if (this.y < this._minY) {
+        this.y = this._maxY;
+      }
+      this.x += this._speedX;
+      return this.y += this._speedY;
+    };
+
+    return Cloud;
+
+  })();
+
+  Cloud.random = function() {
+    var cloud, cloudNum, totalSpeed;
+    cloudNum = Math.ceil(Math.random() * 6);
+    cloud = new Cloud(cloudNum);
+    cloud.x = Math.random() * cloud._maxX;
+    cloud.y = Math.random() * cloud._maxY;
+    cloud.scaleX = cloud.scaleY = .25 + Math.random() / 2;
+    cloud.alpha = .25 + Math.random() / 2;
+    cloud.rotation = 315;
+    totalSpeed = .25 + Math.random() * 2;
+    cloud._speedX = totalSpeed / 2;
+    cloud._speedY = -totalSpeed / 4;
+    return cloud;
+  };
+
+  Cloud.getTicker = function() {
+    var _ref;
+    return (_ref = this._ticker) != null ? _ref : this._ticker = (function() {
+      var _this = this;
+      this.items = [];
+      setInterval(function() {
+        var item, _i, _len, _ref1, _results;
+        _ref1 = _this.items;
+        _results = [];
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          item = _ref1[_i];
+          _results.push(item.update());
+        }
+        return _results;
+      }, 50);
+      return {
+        items: this.items
+      };
+    })();
+  };
+
+  MageKnight.Cloud = Cloud;
+
+}).call(this);
+
+(function() {
   var ControlPanelView,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -361,30 +384,39 @@
 
     __extends(ControlPanelView, _super);
 
-    function ControlPanelView(cameraView, newButton) {
+    function ControlPanelView(cameraView) {
       this.cameraView = cameraView;
+      this.toggleVisibility = __bind(this.toggleVisibility, this);
+
       ControlPanelView.__super__.constructor.call(this);
-      this.scaleX = this.scaleY = 2;
-      this.dimensions = {
-        x: 884,
-        y: 0,
-        width: 396,
-        height: 480
-      };
-      this.collapsedCoordinates = {
-        x: 1280,
-        y: 0
-      };
-      this.hidden = true;
       this.doLayout();
       this.addBackground();
       this.addHideShowButton();
+      this.addNewButton();
       this.addMovementOverlay();
       this.addCamera();
-      newButton.x = 10;
-      newButton.y = 35;
-      this.addChild(newButton);
     }
+
+    ControlPanelView.prototype.hidden = true;
+
+    ControlPanelView.prototype.rotation = 90;
+
+    ControlPanelView.prototype.collapsedCoordinates = {
+      x: 1815,
+      y: 0
+    };
+
+    ControlPanelView.prototype.dimensions = {
+      x: 1440,
+      y: 0,
+      width: 375,
+      height: 900
+    };
+
+    ControlPanelView.prototype.toggleVisibility = function() {
+      this.hidden = !this.hidden;
+      return this.doLayout();
+    };
 
     ControlPanelView.prototype.doLayout = function() {
       if (this.hidden) {
@@ -416,6 +448,33 @@
       return this.addChild(background);
     };
 
+    ControlPanelView.prototype.addHideShowButton = function() {
+      var hsButton;
+      hsButton = new MageKnight.ImageButton({
+        normal: "blade",
+        noMouseOver: true,
+        action: this.toggleVisibility
+      });
+      hsButton.y = 375;
+      return this.addChild(hsButton);
+    };
+
+    ControlPanelView.prototype.addNewButton = function() {
+      var newButton,
+        _this = this;
+      newButton = new MageKnight.ImageButton({
+        normal: "new",
+        action: function() {
+          if (confirm("Are you sure?")) {
+            return MageKnight.newMap();
+          }
+        }
+      });
+      newButton.x = 37;
+      newButton.y = 67;
+      return this.addChild(newButton);
+    };
+
     ControlPanelView.prototype.addMovementOverlay = function() {
       var moveButton,
         _this = this;
@@ -425,24 +484,9 @@
           return MageKnight.toggleMove();
         }
       });
-      moveButton.x = 10;
-      moveButton.y = 100;
+      moveButton.x = 37;
+      moveButton.y = 152;
       return this.addChild(moveButton);
-    };
-
-    ControlPanelView.prototype.addHideShowButton = function() {
-      var hsButton,
-        _this = this;
-      hsButton = new MageKnight.ImageButton({
-        normal: "lefttab",
-        noMouseOver: true,
-        action: function() {
-          _this.hidden = !_this.hidden;
-          return _this.doLayout();
-        }
-      });
-      hsButton.x = -30;
-      return this.addChild(hsButton);
     };
 
     ControlPanelView.prototype.addCamera = function() {

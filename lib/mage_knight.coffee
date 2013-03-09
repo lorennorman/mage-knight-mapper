@@ -47,7 +47,7 @@ MageKnight =
     @terrainMesh.addObserver => @save()
     @terrainMeshView = new MageKnight.TerrainMeshView(mesh)
 
-    clouds = (MageKnight.Cloud.random() for i in [1..10])
+    clouds = (MageKnight.Cloud.random() for i in [1..8])
     camera = new MageKnight.Camera(@terrainMeshView)
     cameraView = new MageKnight.CameraView(camera)
     controlPanel = new MageKnight.ControlPanelView(cameraView)

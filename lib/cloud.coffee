@@ -25,10 +25,10 @@ Cloud.random = ->
   cloud          = new Cloud(cloudNum)
   cloud.x        = Math.random() * cloud._maxX
   cloud.y        = Math.random() * cloud._maxY
-  cloud.scaleX   = cloud.scaleY = .33 + Math.random() / 4
-  cloud.alpha    = .33 + Math.random() / 4
+  cloud.scaleX   = cloud.scaleY = .25 + Math.random() / 2
+  cloud.alpha    = .25 + Math.random() / 2
   cloud.rotation = 315
-  totalSpeed     = .5 + Math.random()*2
+  totalSpeed     = .25 + Math.random()*2
   cloud._speedX  = totalSpeed / 2
   cloud._speedY  = -totalSpeed / 4
   cloud

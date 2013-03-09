@@ -9,19 +9,18 @@ class ControlPanelView extends createjs.Container
     @addMovementOverlay()
     @addCamera()
 
-  scaleX: 2
-  scaleY: 2
   hidden: true
+  rotation: 90
 
   collapsedCoordinates:
-    x: 1280
+    x: 1815
     y: 0
 
   dimensions:
-    x: 884
+    x: 1440
     y: 0
-    width: 396
-    height: 480
+    width: 375
+    height: 900
 
   toggleVisibility: () =>
     @hidden = !@hidden
@@ -42,20 +41,20 @@ class ControlPanelView extends createjs.Container
     @addChild(background)
 
   addHideShowButton: () ->
-    hsButton = new MageKnight.ImageButton(normal: "lefttab", noMouseOver: true, action: @toggleVisibility)
-    hsButton.x = -30
+    hsButton = new MageKnight.ImageButton(normal: "blade", noMouseOver: true, action: @toggleVisibility)
+    hsButton.y = 375
     @addChild(hsButton)
 
   addNewButton: () ->
     newButton = new MageKnight.ImageButton(normal: "new", action: => MageKnight.newMap() if confirm("Are you sure?"))
-    newButton.x = 10
-    newButton.y = 35
+    newButton.x = 37
+    newButton.y = 67
     @addChild(newButton)
 
   addMovementOverlay: () ->
     moveButton = new MageKnight.ImageButton(normal: "movement", action: => MageKnight.toggleMove())
-    moveButton.x = 10
-    moveButton.y = 100
+    moveButton.x = 37
+    moveButton.y = 152
     @addChild(moveButton)
 
   addCamera: () ->

@@ -30,14 +30,14 @@ class ImageButton extends createjs.Container
   constructor: (opts={}) ->
     super()
 
-    normalFile = "#{MageKnight.Loader.filePath}interface/#{opts.normal}.png"
+    normalFile = "#{MageKnight.Loader.filePath}interface/buttons/#{opts.normal}_up.png"
     normalImage = new createjs.Bitmap(normalFile)
     @addChild(normalImage)
 
     @addEventListener "click", opts.action
 
     unless opts.noMouseOver?
-      overFile = "#{MageKnight.Loader.filePath}interface/#{opts.normal}_over.png"
+      overFile = "#{MageKnight.Loader.filePath}interface/buttons/#{opts.normal}_over.png"
       overImage = new createjs.Bitmap(overFile)
 
       @addEventListener "mouseover", =>
