@@ -62,7 +62,7 @@
       return this.getStage().removeAllChildren();
     },
     setMesh: function(mesh) {
-      var camera, cameraView, cloud, clouds, controlPanel, i, stage, _i, _len,
+      var cameraControls, cloud, clouds, controlPanel, i, stage, _i, _len,
         _this = this;
       this.terrainMesh = mesh;
       this.terrainMesh.addObserver(function() {
@@ -77,11 +77,11 @@
         }
         return _results;
       })();
-      camera = new MageKnight.Camera(this.terrainMeshView);
-      cameraView = new MageKnight.CameraView(camera);
-      controlPanel = new MageKnight.ControlPanelView(cameraView);
+      this.cameraView = new MageKnight.CameraView(this.terrainMeshView);
+      cameraControls = new MageKnight.CameraControlsView(this.cameraView);
+      controlPanel = new MageKnight.ControlPanelView(cameraControls);
       stage = this.getStage();
-      stage.addChild(this.terrainMeshView);
+      stage.addChild(this.cameraView);
       for (_i = 0, _len = clouds.length; _i < _len; _i++) {
         cloud = clouds[_i];
         stage.addChild(cloud);
@@ -91,11 +91,35 @@
     toggleMove: function() {
       MageKnight.ViewSettings.showMoveScore = !MageKnight.ViewSettings.showMoveScore;
       return this.terrainMeshView.updateDisplayList();
+    },
+    setDay: function() {
+      if (!MageKnight.ViewSettings.isDay) {
+        MageKnight.ViewSettings.isDay = true;
+        return this.terrainMeshView.updateDisplayList();
+      }
+    },
+    setNight: function() {
+      if (MageKnight.ViewSettings.isDay) {
+        MageKnight.ViewSettings.isDay = false;
+        return this.terrainMeshView.updateDisplayList();
+      }
+    },
+    getTileInfo: function(tile) {
+      this.getCardViewer().setCardByModel(tile.feature);
+      return this.getStage().addChild(this.cardViewer);
+    },
+    getCardViewer: function() {
+      var _ref,
+        _this = this;
+      return (_ref = this.cardViewer) != null ? _ref : this.cardViewer = new MageKnight.CardViewer(function() {
+        return _this.getStage().removeChild(_this.cardViewer);
+      });
     }
   };
 
   MageKnight.ViewSettings = {
-    showMoveScore: false
+    showMoveScore: false,
+    isDay: true
   };
 
   window.MageKnight = MageKnight;
@@ -182,72 +206,18 @@
 }).call(this);
 
 (function() {
-  var Camera,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-  Camera = (function() {
-
-    function Camera(view) {
-      this.view = view;
-      this.zoomOut = __bind(this.zoomOut, this);
-
-      this.zoomIn = __bind(this.zoomIn, this);
-
-      this.down = __bind(this.down, this);
-
-      this.up = __bind(this.up, this);
-
-      this.right = __bind(this.right, this);
-
-      this.left = __bind(this.left, this);
-
-    }
-
-    Camera.prototype.left = function() {
-      return this.view.y += 50;
-    };
-
-    Camera.prototype.right = function() {
-      return this.view.y -= 50;
-    };
-
-    Camera.prototype.up = function() {
-      return this.view.x -= 50;
-    };
-
-    Camera.prototype.down = function() {
-      return this.view.x += 50;
-    };
-
-    Camera.prototype.zoomIn = function() {
-      return this.view.scaleX = this.view.scaleY *= 1.1;
-    };
-
-    Camera.prototype.zoomOut = function() {
-      return this.view.scaleX = this.view.scaleY *= 0.9;
-    };
-
-    return Camera;
-
-  })();
-
-  MageKnight.Camera = Camera;
-
-}).call(this);
-
-(function() {
-  var CameraView,
+  var CameraControlsView,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  CameraView = (function(_super) {
+  CameraControlsView = (function(_super) {
 
-    __extends(CameraView, _super);
+    __extends(CameraControlsView, _super);
 
-    function CameraView(camera) {
+    function CameraControlsView(camera) {
       var down, left, right, up, zoomIn, zoomOut;
       this.camera = camera;
-      CameraView.__super__.constructor.call(this);
+      CameraControlsView.__super__.constructor.call(this);
       left = new MageKnight.ImageButton({
         normal: "left",
         action: this.camera.left
@@ -287,11 +257,117 @@
       this.addChild(left, right, up, down, zoomIn, zoomOut);
     }
 
+    return CameraControlsView;
+
+  })(createjs.Container);
+
+  MageKnight.CameraControlsView = CameraControlsView;
+
+}).call(this);
+
+(function() {
+  var CameraView,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  CameraView = (function(_super) {
+
+    __extends(CameraView, _super);
+
+    function CameraView(containedView) {
+      this.containedView = containedView;
+      this.zoomOut = __bind(this.zoomOut, this);
+
+      this.zoomIn = __bind(this.zoomIn, this);
+
+      this.down = __bind(this.down, this);
+
+      this.up = __bind(this.up, this);
+
+      this.right = __bind(this.right, this);
+
+      this.left = __bind(this.left, this);
+
+      CameraView.__super__.constructor.call(this);
+      this.addChild(this.containedView);
+    }
+
+    CameraView.prototype.left = function() {
+      return this.containedView.y += 50;
+    };
+
+    CameraView.prototype.right = function() {
+      return this.containedView.y -= 50;
+    };
+
+    CameraView.prototype.up = function() {
+      return this.containedView.x -= 50;
+    };
+
+    CameraView.prototype.down = function() {
+      return this.containedView.x += 50;
+    };
+
+    CameraView.prototype.zoomIn = function() {
+      return this.containedView.scaleX = this.containedView.scaleY *= 1.1;
+    };
+
+    CameraView.prototype.zoomOut = function() {
+      return this.containedView.scaleX = this.containedView.scaleY *= 0.9;
+    };
+
     return CameraView;
 
   })(createjs.Container);
 
   MageKnight.CameraView = CameraView;
+
+}).call(this);
+
+(function() {
+  var CardViewer,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  CardViewer = (function(_super) {
+
+    __extends(CardViewer, _super);
+
+    function CardViewer(exitFunc) {
+      var cancelButton, cardHeight, cardWidth;
+      CardViewer.__super__.constructor.call(this);
+      this.card = new createjs.Bitmap;
+      cardWidth = 697;
+      cardHeight = 497;
+      this.card.x = cardWidth;
+      this.card.regX = cardWidth / 2;
+      this.card.y = cardHeight - 20;
+      this.card.regY = cardHeight / 2;
+      this.card.rotation = 90;
+      this.addChild(this.card);
+      cancelButton = new MageKnight.ImageButton({
+        normal: "x",
+        action: exitFunc
+      });
+      cancelButton.x = cardWidth * 3 / 2 - 60;
+      cancelButton.y = cardHeight * 3 / 2 + 25;
+      cancelButton.rotation = 90;
+      this.addChild(cancelButton);
+    }
+
+    CardViewer.prototype.setCardByModel = function(model) {
+      var img;
+      img = new Image;
+      img.src = "" + MageKnight.Loader.filePath + "/interface/cards/" + model + ".png";
+      return this.card.image = img;
+    };
+
+    return CardViewer;
+
+  })(createjs.Container);
+
+  MageKnight.CardViewer = CardViewer;
 
 }).call(this);
 
@@ -384,8 +460,8 @@
 
     __extends(ControlPanelView, _super);
 
-    function ControlPanelView(cameraView) {
-      this.cameraView = cameraView;
+    function ControlPanelView(cameraControlsView) {
+      this.cameraControlsView = cameraControlsView;
       this.toggleVisibility = __bind(this.toggleVisibility, this);
 
       ControlPanelView.__super__.constructor.call(this);
@@ -394,6 +470,7 @@
       this.addHideShowButton();
       this.addNewButton();
       this.addMovementOverlay();
+      this.addDayNightButtons();
       this.addCamera();
     }
 
@@ -489,9 +566,32 @@
       return this.addChild(moveButton);
     };
 
+    ControlPanelView.prototype.addDayNightButtons = function() {
+      var dayButton, nightButton,
+        _this = this;
+      dayButton = new MageKnight.ImageButton({
+        normal: "day",
+        action: function() {
+          return MageKnight.setDay();
+        }
+      });
+      dayButton.x = 37;
+      dayButton.y = 237;
+      this.addChild(dayButton);
+      nightButton = new MageKnight.ImageButton({
+        normal: "night",
+        action: function() {
+          return MageKnight.setNight();
+        }
+      });
+      nightButton.x = 168;
+      nightButton.y = 237;
+      return this.addChild(nightButton);
+    };
+
     ControlPanelView.prototype.addCamera = function() {
-      this.cameraView.x = 20;
-      return this.addChild(this.cameraView);
+      this.cameraControlsView.x = 20;
+      return this.addChild(this.cameraControlsView);
     };
 
     return ControlPanelView;
@@ -539,6 +639,15 @@
 
   HexCoordinate = (function() {
 
+    HexCoordinate.prototype.parityChart = {
+      0: [1, -1],
+      1: [2, 0],
+      2: [1, 1],
+      3: [-1, 1],
+      4: [-2, 0],
+      5: [-1, -1]
+    };
+
     function HexCoordinate(array) {
       this.array = HexCoordinate.validate(array);
     }
@@ -563,6 +672,28 @@
 
     HexCoordinate.prototype.getGroupAdjacencies = function() {
       return [new HexCoordinate(this.array.concat([0, 0, 1])), new HexCoordinate(this.array.concat([1, 1, 2])), new HexCoordinate(this.array.concat([2, 2, 3])), new HexCoordinate(this.array.concat([3, 3, 4])), new HexCoordinate(this.array.concat([4, 4, 5])), new HexCoordinate(this.array.concat([5, 5, 0]))];
+    };
+
+    HexCoordinate.prototype.applyParityTo = function(coordinate) {
+      var hexordinate, transformedX, transformedY, _fn, _i, _len, _ref,
+        _this = this;
+      transformedX = coordinate[0];
+      transformedY = coordinate[1];
+      _ref = this.array;
+      _fn = function(hexordinate) {
+        var parity;
+        parity = _this.parityChart[hexordinate];
+        if (parity == null) {
+          throw "What neighbor is this? " + direction;
+        }
+        transformedX += parity[0];
+        return transformedY += parity[1];
+      };
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        hexordinate = _ref[_i];
+        _fn(hexordinate);
+      }
+      return [transformedX, transformedY];
     };
 
     return HexCoordinate;
@@ -723,9 +854,9 @@
       if (opts == null) {
         opts = {};
       }
+      MageKnight.Util.makeObservable(this);
       this.tiles = {};
       this.groupTiles = [];
-      this.observers = [];
       this.tileStack = opts['tileStack'] || new MageKnight.TileStack;
     }
 
@@ -898,26 +1029,6 @@
       return this.tileStack.next();
     };
 
-    TerrainMesh.prototype.addObserver = function(observer) {
-      this.observers.push(observer);
-      return this.notifyObserver(observer);
-    };
-
-    TerrainMesh.prototype.notifyObservers = function() {
-      var observer, _i, _len, _ref, _results;
-      _ref = this.observers;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        observer = _ref[_i];
-        _results.push(this.notifyObserver(observer));
-      }
-      return _results;
-    };
-
-    TerrainMesh.prototype.notifyObserver = function(observer) {
-      return (typeof observer.notify === "function" ? observer.notify() : void 0) || observer();
-    };
-
     return TerrainMesh;
 
   })();
@@ -960,6 +1071,7 @@
       this.updateDisplayList = __bind(this.updateDisplayList, this);
 
       TerrainMeshView.__super__.constructor.call(this);
+      MageKnight.Util.makeObservable(this);
       this.x = 140;
       this.y = 400;
       this.rotation = 40;
@@ -972,7 +1084,8 @@
     TerrainMeshView.prototype.updateDisplayList = function() {
       this.clearViews();
       this.addHintViews();
-      return this.addTileViews();
+      this.addTileViews();
+      return this.notifyObservers();
     };
 
     TerrainMeshView.prototype.clearViews = function() {
@@ -990,6 +1103,9 @@
           var tileView;
           tileView = _this.tileViewFactory.findByModel(tile);
           tileView.updateByModel(tile);
+          tileView.onClick = function() {
+            return MageKnight.getTileInfo(tile);
+          };
           return _this.addChild(tileView);
         })(tile));
       }
@@ -2112,14 +2228,6 @@
   TileView = {
     width: 150,
     height: 196,
-    parityChart: {
-      0: [1, -1],
-      1: [2, 0],
-      2: [1, 1],
-      3: [-1, 1],
-      4: [-2, 0],
-      5: [-1, -1]
-    },
     featureFileMap: {
       portal: "portal",
       village: "village",
@@ -2171,10 +2279,15 @@
       return moveScoreText;
     },
     fromModel: function(model) {
-      var container, currentFeatureView, currentMoveScoreOverlay, currentTerrainView, _ref,
+      var container, currentFeatureView, currentMoveScoreOverlay, currentTerrainView, _ref, _ref1,
         _this = this;
       container = new createjs.Container();
-      _ref = this.transformByParity([0, 0], model.position), container.x = _ref[0], container.y = _ref[1];
+      if ((_ref = this.nightFilter) == null) {
+        this.nightFilter = MageKnight.Util.getNightFilter();
+      }
+      _ref1 = model.position.applyParityTo([0, 0]), container.x = _ref1[0], container.y = _ref1[1];
+      container.x = TileView.width * container.x / 2;
+      container.y = TileView.height * container.y * 2 / 3;
       currentTerrainView = null;
       currentFeatureView = null;
       currentMoveScoreOverlay = null;
@@ -2196,66 +2309,48 @@
         currentFeatureView = newFeatureView;
         if (MageKnight.ViewSettings.showMoveScore) {
           currentMoveScoreOverlay = _this.getMoveScoreOverlay(model.terrain);
-          return container.addChild(currentMoveScoreOverlay);
+          container.addChild(currentMoveScoreOverlay);
         } else {
           if (currentMoveScoreOverlay != null) {
-            return container.removeChild(currentMoveScoreOverlay);
+            container.removeChild(currentMoveScoreOverlay);
           }
+        }
+        if (MageKnight.ViewSettings.isDay) {
+          container.uncache();
+          return container.filters = [];
+        } else {
+          container.filters = [_this.nightFilter];
+          return setTimeout(function() {
+            container.cache(0, 0, TileView.width, TileView.height);
+            return setTimeout(function() {
+              return container.updateCache();
+            }, 100);
+          });
         }
       };
       model.addObserver(function() {
         return container.updateByModel(model);
       });
-      container.alpha = 0;
-      setTimeout(function() {
-        return createjs.Tween.get(container).to({
-          alpha: 1
-        }, 5000, createjs.Ease.quintOut);
-      });
+      if (MageKnight.ViewSettings.isDay) {
+        container.alpha = 0;
+        setTimeout(function() {
+          return createjs.Tween.get(container).to({
+            alpha: 1
+          }, 5000, createjs.Ease.quintOut);
+        });
+      }
       return container;
-    },
-    getNightFilter: function() {
-      var brightness, colorMatrix, colorMatrixFilter, contrast, hue, saturation;
-      if (!(createjs.ColorMatrix && createjs.ColorMatrixFilter)) {
-        throw "You must have the external Filters included!";
-      }
-      brightness = -5;
-      contrast = 0;
-      saturation = -35;
-      hue = -82;
-      colorMatrix = new createjs.ColorMatrix(brightness, contrast, saturation, hue);
-      return colorMatrixFilter = new createjs.ColorMatrixFilter(colorMatrix);
-    },
-    transformByParity: function(coordinate, hexordinates) {
-      var hexordinate, transformedX, transformedY, _fn, _i, _len, _ref,
-        _this = this;
-      transformedX = coordinate[0];
-      transformedY = coordinate[1];
-      _ref = hexordinates.array;
-      _fn = function(hexordinate) {
-        var parity;
-        parity = _this.parityChart[hexordinate];
-        if (parity == null) {
-          throw "What neighbor is this? " + direction;
-        }
-        transformedX += _this.width * parity[0] / 2;
-        return transformedY += 2 * _this.height * parity[1] / 3;
-      };
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        hexordinate = _ref[_i];
-        _fn(hexordinate);
-      }
-      return [transformedX, transformedY];
     }
   };
 
   HintView = {
     fromHexordinate: function(hexordinate) {
-      var centerPoint, hintView, _ref;
+      var hintView, _ref;
       hintView = new createjs.Bitmap("" + MageKnight.Loader.filePath + "interface/7hex.png");
-      centerPoint = [-TileView.width, -TileView.height * 2 / 3];
       hintView.alpha = .25;
-      _ref = TileView.transformByParity(centerPoint, hexordinate), hintView.x = _ref[0], hintView.y = _ref[1];
+      _ref = hexordinate.applyParityTo([0, 0]), hintView.x = _ref[0], hintView.y = _ref[1];
+      hintView.x = TileView.width * hintView.x / 2 - TileView.width;
+      hintView.y = TileView.height * hintView.y * 2 / 3 - TileView.height * 2 / 3;
       hintView.onMouseOver = function() {
         return createjs.Tween.get(hintView).to({
           alpha: .7
@@ -2302,6 +2397,7 @@
 }).call(this);
 
 (function() {
+  var Observable;
 
   MageKnight.Util = {
     promptUntilValid: function(text, maxAnswer) {
@@ -2333,6 +2429,45 @@
         coreNonCity: nonCity,
         coreCity: city
       });
+    },
+    getNightFilter: function() {
+      var brightness, colorMatrix, contrast, hue, saturation;
+      if (!(createjs.ColorMatrix && createjs.ColorMatrixFilter)) {
+        throw "You must have the external Filters included!";
+      }
+      brightness = -5;
+      contrast = 0;
+      saturation = -35;
+      hue = -82;
+      colorMatrix = new createjs.ColorMatrix(brightness, contrast, saturation, hue);
+      return new createjs.ColorMatrixFilter(colorMatrix);
+    },
+    makeObservable: function(toObserve) {
+      return (_(toObserve)).extend(_.clone(Observable));
+    }
+  };
+
+  Observable = {
+    getObservers: function() {
+      var _ref;
+      return (_ref = this.observers) != null ? _ref : this.observers = [];
+    },
+    addObserver: function(observer) {
+      this.getObservers().push(observer);
+      return this.notifyObserver(observer);
+    },
+    notifyObservers: function() {
+      var observer, _i, _len, _ref, _results;
+      _ref = this.getObservers();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        observer = _ref[_i];
+        _results.push(this.notifyObserver(observer));
+      }
+      return _results;
+    },
+    notifyObserver: function(observer) {
+      return (typeof observer.notify === "function" ? observer.notify() : void 0) || observer();
     }
   };
 
