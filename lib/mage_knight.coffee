@@ -71,6 +71,14 @@ MageKnight =
       MageKnight.ViewSettings.isDay = false
       @terrainMeshView.updateDisplayList()
 
+  getTileInfo: (tile) ->
+    @getCardViewer().setCardByModel(tile.feature)
+    @getStage().addChild(@cardViewer)
+
+  getCardViewer: ->
+    @cardViewer ?= new MageKnight.CardViewer =>
+      @getStage().removeChild(@cardViewer)
+
 MageKnight.ViewSettings =
   showMoveScore: false
   isDay: true

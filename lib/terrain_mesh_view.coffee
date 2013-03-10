@@ -27,6 +27,9 @@ class MageKnight.TerrainMeshView extends createjs.Container
       do (tile) =>
         tileView = @tileViewFactory.findByModel(tile)
         tileView.updateByModel(tile)
+        tileView.onClick = ->
+          MageKnight.getTileInfo(tile)
+
         @addChild(tileView)
 
   addHintViews: ->
